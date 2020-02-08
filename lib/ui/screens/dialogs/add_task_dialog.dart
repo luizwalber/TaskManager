@@ -8,12 +8,12 @@ import 'package:task_manager/ui/widgets/weekday_selector.dart';
 import 'package:task_manager/utils/enums.dart';
 import 'package:task_manager/utils/styles.dart';
 
-void addTaskDialog(BuildContext context, DateTime selectedDay) {
+void addTaskDialog(BuildContext context, DateTime selectedDay, {Task task}) {
   Dialog dialog = Dialog(
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
     child: Container(
-//      height: MediaQuery.of(context).size.width * 0.8,
-//      width: MediaQuery.of(context).size.width * 0.8,
+      height: MediaQuery.of(context).size.height * 0.55,
+      width: MediaQuery.of(context).size.width * 0.6,
       child: Column(
         children: <Widget>[
           Container(
@@ -32,7 +32,7 @@ void addTaskDialog(BuildContext context, DateTime selectedDay) {
                   fontWeight: FontWeight.w600),
             ),
           ),
-          AddTaskForm(selectedDay: selectedDay),
+          AddTaskForm(selectedDay: selectedDay, task: task),
         ],
       ),
     ),
@@ -43,8 +43,9 @@ void addTaskDialog(BuildContext context, DateTime selectedDay) {
 // TODO bugs conhecidos, mudar a frequancia faz focar o titulo
 class AddTaskForm extends StatefulWidget {
   final DateTime selectedDay;
+  final Task task;
 
-  const AddTaskForm({this.selectedDay});
+  const AddTaskForm({this.selectedDay, this.task});
 
   @override
   AddTaskFormState createState() => AddTaskFormState();
@@ -80,6 +81,10 @@ class AddTaskFormState extends State<AddTaskForm> {
     _selectedDays = [true, true, true, true, true, true, true];
     _frequencyMenuItems = getDropDownMenuItems();
     print(_frequencyMenuItems);
+
+    if (widget.task != null) {
+      controllerTitle.text = widget.task.title;
+    }
     super.initState();
   }
 
@@ -90,18 +95,22 @@ class AddTaskFormState extends State<AddTaskForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            titleWidget(),
-            repeatWidget(),
-            frequencyWidget(),
-            daySelectorWidget(),
-            useLocationWidget(),
-            descriptionWidget(),
-            submitWidget()
+            _titleWidget(),
+            _repeatWidget(),
+            _frequencyWidget(),
+            _daySelectorWidget(),
+            _useLocationWidget(),
+            _descriptionWidget(),
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: Divider(height: 30, thickness: 3, color: Colors.black12),
+            ),
+            _submitWidget()
           ],
         ));
   }
 
-  Padding titleWidget() {
+  Padding _titleWidget() {
     return Padding(
       padding: edgesBtweenForm,
       child: TextFormField(
@@ -117,7 +126,7 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Padding repeatWidget() {
+  Padding _repeatWidget() {
     return Padding(
       padding: edgesBtweenForm,
       child: MergeSemantics(
@@ -129,7 +138,7 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Visibility frequencyWidget() {
+  Visibility _frequencyWidget() {
     return Visibility(
       visible: _repeat,
       child: Column(
@@ -147,7 +156,7 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Visibility daySelectorWidget() {
+  Visibility _daySelectorWidget() {
     return Visibility(
       visible: _currentFrequency == TaskFrequency.CUSTOM,
       child: Padding(
@@ -158,7 +167,7 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Padding useLocationWidget() {
+  Padding _useLocationWidget() {
     return Padding(
       padding: edgesBtweenForm,
       child: MergeSemantics(
@@ -170,7 +179,7 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Padding descriptionWidget() {
+  Padding _descriptionWidget() {
     return Padding(
       padding: edgesBtweenForm,
       child: TextFormField(
@@ -187,7 +196,7 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Align submitWidget() {
+  Align _submitWidget() {
     return Align(
       alignment: FractionalOffset.bottomCenter,
       child: StoreConnector<AppState, AppState>(
@@ -267,6 +276,7 @@ class AddTaskFormState extends State<AddTaskForm> {
         Navigator.of(context).pop();
         StoreProvider.of<AppState>(context).dispatch(addTask(task));
       } else {
+        print("task:\n");
         //TODO there was some error in saving the task in database
       }
     }

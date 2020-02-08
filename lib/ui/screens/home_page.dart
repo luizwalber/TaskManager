@@ -103,8 +103,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         converter: (store) => store.state,
         builder: (_, state) {
           return Expanded(
-              child: buildTaskList(context,
-                  state.monthlyTasks[dateDayHash(_selectedDay)], _selectedDay));
+              child: TaskList(
+                  selectedTasks: state.monthlyTasks[dateDayHash(_selectedDay)],
+                  selectedDay: _selectedDay));
         });
   }
 
