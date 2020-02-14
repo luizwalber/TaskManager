@@ -24,6 +24,14 @@ class UpdateMonthlyTasks {
   UpdateMonthlyTasks(this._monthlyTasks);
 }
 
+class UpdateTask {
+  Map<String, List<Task>> _monthlyTasks;
+
+  Map<String, List<Task>> get monthlyTasks => this._monthlyTasks;
+
+  UpdateTask(this._monthlyTasks);
+}
+
 class GetMonthlyTasks {
   Map<String, List<Task>> _monthlyTasks;
 

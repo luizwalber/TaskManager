@@ -8,32 +8,35 @@ import 'package:task_manager/ui/widgets/weekday_selector.dart';
 import 'package:task_manager/utils/enums.dart';
 import 'package:task_manager/utils/styles.dart';
 
+/// TODO class???
+/// TODO know bug -> when adding a task in the front the task doesn't have an ID, this will be a problem when using the database
 void addTaskDialog(BuildContext context, DateTime selectedDay, {Task task}) {
   Dialog dialog = Dialog(
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-    child: Container(
-      height: MediaQuery.of(context).size.height * 0.55,
-      width: MediaQuery.of(context).size.width * 0.6,
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(12),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30))),
-            child: Text(
-              "Dialog With Image",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600),
+    child: SingleChildScrollView(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.6,
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(12),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30))),
+              child: Text(
+                "Add Task Dialog",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600),
+              ),
             ),
-          ),
-          AddTaskForm(selectedDay: selectedDay, task: task),
-        ],
+            AddTaskForm(selectedDay: selectedDay, task: task),
+          ],
+        ),
       ),
     ),
   );
@@ -78,7 +81,7 @@ class AddTaskFormState extends State<AddTaskForm> {
     _useLocation = false;
 
     _currentFrequency = TaskFrequency.DAILY;
-    _selectedDays = [true, true, true, true, true, true, true];
+    _selectedDays = [false, false, false, false, false, false, false];
     _frequencyMenuItems = getDropDownMenuItems();
     print(_frequencyMenuItems);
 
@@ -232,7 +235,9 @@ class AddTaskFormState extends State<AddTaskForm> {
   }
 
   void _onPressedDayOfWeek(position) {
-    _selectedDays[position] = !_selectedDays[position];
+    setState(() {
+      _selectedDays[position] = !_selectedDays[position];
+    });
     print("position:$position : ${_selectedDays[position]}");
   }
 
@@ -265,16 +270,16 @@ class AddTaskFormState extends State<AddTaskForm> {
             title: controllerTitle.text,
             createdForDay: widget.selectedDay,
             frequency: _currentFrequency,
-            status: TaskStatus.ON_GOING,
+            status: null,
             useLocation: _useLocation,
             month: widget.selectedDay.month,
             timeSpent: "00:00:00",
             location: '',
-            selectedDays: null,
+            selectedDays: _selectedDays,
             description: controllerDescription.text);
         print("task:\n$task");
-        Navigator.of(context).pop();
         StoreProvider.of<AppState>(context).dispatch(addTask(task));
+        Navigator.of(context).pop();
       } else {
         print("task:\n");
         //TODO there was some error in saving the task in database

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -6,6 +7,7 @@ import 'package:task_manager/model/task.dart';
 import 'package:task_manager/redux/thunks.dart';
 import 'package:task_manager/ui/widgets/task_list.dart';
 import 'package:task_manager/utils/date_utils.dart';
+import 'package:task_manager/utils/enums.dart';
 
 // TODO show day in the middle of the divider between the calendar and the tasks
 class HomePage extends StatefulWidget {
@@ -70,31 +72,34 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         converter: (store) => store.state,
         builder: (context, state) {
           return TableCalendar(
-              locale: 'pt_br',
-              calendarController: _calendarController,
-              events: extractEvents(state),
-              calendarStyle: _calendarStyle(),
-              daysOfWeekStyle: _calendarDaysOfWeekStyle(),
-              headerStyle: _calendarHeaderStyle(),
-              builders: calendarBuilders(),
-              onDaySelected: _onDaySelected,
-              onVisibleDaysChanged: _onMonthChange);
+            rowHeight: 50,
+            locale: 'pt_br',
+            calendarController: _calendarController,
+            events: extractEvents(state),
+            calendarStyle: _calendarStyle(),
+            headerStyle: _calendarHeaderStyle(),
+            builders: calendarBuilders(),
+            onDaySelected: _onDaySelected,
+            onVisibleDaysChanged: _onMonthChange,
+          );
         });
   }
 
   void _onMonthChange(DateTime first, DateTime last, CalendarFormat format) {
-    /// I couldn't find any method to get the month change event, I could only update the monthly tasks
+    /// I couldn't find any method to trigger the month change event, I could only update the monthly tasks
     /// using the method that is called when the visible days is changed, but if the calendar shows
-    /// outside months in the visible days could occur an error, the code bellow fix that
+    /// outside months in the visible days will get the wrong month, the code bellow fix that
     int month = last.day < 7 ? last.month - 1 : last.month;
     StoreProvider.of<AppState>(context).dispatch(getMonthlyTasks(month));
   }
 
   CalendarBuilders calendarBuilders() {
     return CalendarBuilders(
+      //dayBuilder: _dayBuilder,
       selectedDayBuilder: _onSelectDay,
       todayDayBuilder: _todayBuilder,
       markersBuilder: _markersBuilder,
+      weekendDayBuilder: _weekendDayBuilder,
     );
   }
 
@@ -130,79 +135,80 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildEventsMarker(DateTime date, List events) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        color: _calendarController.isSelected(date)
-            ? Colors.brown[500]
-            : _calendarController.isToday(date)
-                ? Colors.brown[300]
-                : Colors.blue[400],
-      ),
-      width: 16.0,
-      height: 16.0,
-      child: Center(
-        child: Text(
-          '${events.length}',
-          style: TextStyle().copyWith(
-            color: Colors.white,
-            fontSize: 12.0,
+  List<Widget> _markersBuilder(context, date, tasks, holidays) {
+    return _buildMarkers(tasks, date);
+  }
+
+  Widget _todayBuilder(context, date, _) {
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          color: Colors.grey[300],
+        ),
+        width: 100,
+        height: 100,
+        child: Center(
+          child: Text(
+            '${date.day}',
+            style: TextStyle().copyWith(fontSize: 16.0),
           ),
         ),
       ),
     );
   }
 
-  List<Widget> _markersBuilder(context, date, tasks, holidays) {
-    return _buildMarkers(tasks, date);
+  Widget _weekendDayBuilder(context, date, _) {
+    return Center(
+      child: Container(
+        child: Center(
+          child: Text(
+            '${date.day}',
+            style: TextStyle().copyWith(fontSize: 14.0),
+          ),
+        ),
+      ),
+    );
   }
 
-  Widget _todayBuilder(context, date, _) {
-    return Container(
-      margin: const EdgeInsets.all(4.0),
-      padding: const EdgeInsets.only(top: 5.0, left: 6.0),
-      color: Colors.amber[400],
-      width: 100,
-      height: 100,
-      child: Text(
-        '${date.day}',
-        style: TextStyle().copyWith(fontSize: 16.0),
+  Widget _dayBuilder(context, date, _) {
+    return Center(
+      child: Container(
+        child: Center(
+          child: Text(
+            '${date.day}',
+            style: TextStyle().copyWith(fontSize: 14.0),
+          ),
+        ),
       ),
     );
   }
 
   Widget _onSelectDay(context, date, _) {
     return FadeTransition(
-      opacity: Tween(begin: 0.0, end: 1.0).animate(_animationController),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
-          color: Colors.deepOrange[300],
-        ),
-        margin: const EdgeInsets.all(4.0),
-        padding: const EdgeInsets.only(top: 5.0, left: 6.0),
-        width: 100,
-        height: 100,
-        child: Text(
-          '${date.day}',
-          style: TextStyle().copyWith(fontSize: 16.0),
-        ),
-      ),
-    );
+        opacity: Tween(begin: 0.0, end: 1.0).animate(_animationController),
+        child: Center(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              color: Colors.red[100],
+            ),
+            width: 100,
+            height: 100,
+            child: Center(
+              child: Text(
+                '${date.day}',
+                style: TextStyle().copyWith(fontSize: 16.0),
+              ),
+            ),
+          ),
+        ));
   }
 
   HeaderStyle _calendarHeaderStyle() {
     return HeaderStyle(
       centerHeaderTitle: true,
       formatButtonVisible: false,
-    );
-  }
-
-  DaysOfWeekStyle _calendarDaysOfWeekStyle() {
-    return DaysOfWeekStyle(
-      weekendStyle: TextStyle().copyWith(color: Colors.blue[600]),
     );
   }
 
@@ -221,6 +227,65 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return events;
   }
 
+  Widget _buildTaskNumber(DateTime date, List tasks) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        color: Colors.blue[400],
+      ),
+      width: 16.0,
+      height: 16.0,
+      child: Center(
+        child: Text(
+          '${tasks.length}',
+          style: TextStyle().copyWith(
+            color: Colors.white,
+            fontSize: 12.0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTaskStatusFlag(DateTime date, List<Task> tasks) {
+    TaskStatus _selectedDayTasksFlag;
+    bool hasOneDone = false;
+    tasks.forEach((Task task) {
+      if (task.status == TaskStatus.NOT_DONE) {
+        if (!hasOneDone) {
+          _selectedDayTasksFlag = TaskStatus.NOT_DONE;
+        } else {
+          _selectedDayTasksFlag = TaskStatus.PARTIALLY;
+        }
+      } else if (task.status == TaskStatus.PARTIALLY &&
+          _selectedDayTasksFlag != TaskStatus.NOT_DONE) {
+        _selectedDayTasksFlag = TaskStatus.PARTIALLY;
+      } else if (task.status == TaskStatus.DONE) {
+        if (_selectedDayTasksFlag == null)
+          _selectedDayTasksFlag = TaskStatus.DONE;
+        else
+          _selectedDayTasksFlag = TaskStatus.PARTIALLY;
+        hasOneDone = true;
+      }
+    });
+    if (_selectedDayTasksFlag == null) return Text('');
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: _selectedDayTasksFlag == TaskStatus.DONE
+            ? Colors.green
+            : _selectedDayTasksFlag == TaskStatus.PARTIALLY
+                ? Colors.orange
+                : Colors.redAccent,
+      ),
+      width: 16.0,
+      height: 16.0,
+    );
+  }
+
   List<Widget> _buildMarkers(List tasks, DateTime date) {
     final children = <Widget>[];
 
@@ -229,7 +294,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         Positioned(
           right: 1,
           bottom: 1,
-          child: _buildEventsMarker(date, tasks),
+          child: _buildTaskNumber(date, tasks),
+        ),
+      );
+      children.add(
+        Positioned(
+          right: 1,
+          top: 1,
+          child: _buildTaskStatusFlag(date, tasks),
         ),
       );
     }

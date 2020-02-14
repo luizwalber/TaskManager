@@ -4,7 +4,9 @@ import 'package:task_manager/redux/actions.dart';
 
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
-      monthlyTasks: monthlyTasksReducer(state.monthlyTasks, action));
+    monthlyTasks: monthlyTasksReducer(state.monthlyTasks, action),
+    selectedDays: selectedDayReducer(state.selectedDays, action),
+  );
 }
 
 Map<String, List<Task>> monthlyTasksReducer(
@@ -21,5 +23,13 @@ Map<String, List<Task>> monthlyTasksReducer(
     return Map.from(monthlyTasks)
       ..clear()
       ..addAll(action.monthlyTasks);
+  if (action is UpdateTask)
+    return Map.from(monthlyTasks)
+      ..clear()
+      ..addAll(action.monthlyTasks);
   return monthlyTasks;
+}
+
+List<bool> selectedDayReducer(List<bool> selectedDays, dynamic action) {
+  return selectedDays;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// TODO add theme to widget (and all the app by the way)
 class WeekdaySelector extends StatefulWidget {
   static const sunday = 0;
   static const monday = 1;
@@ -10,9 +11,11 @@ class WeekdaySelector extends StatefulWidget {
   static const saturday = 6;
 
   final Color color;
+  final Color pressedColor;
   final Function(int) onPressed;
 
-  const WeekdaySelector({Key key, this.color, this.onPressed})
+  const WeekdaySelector(
+      {Key key, this.color, this.pressedColor, this.onPressed})
       : super(key: key);
 
   @override
@@ -25,7 +28,7 @@ class WeekdaySelectorState extends State<WeekdaySelector> {
   @override
   void initState() {
     setState(() {
-      _selectedDays = [true, true, true, true, true, true, true];
+      _selectedDays = [false, false, false, false, false, false, false];
     });
     super.initState();
   }
@@ -46,6 +49,7 @@ class WeekdaySelectorState extends State<WeekdaySelector> {
       print("value $value");
       final Widget day = _Day(
           color: widget.color,
+          pressedColor: Colors.yellow,
           label: label,
           selected: _selectedDays[value],
           position: value,
@@ -59,6 +63,7 @@ class WeekdaySelectorState extends State<WeekdaySelector> {
 
 class _Day extends StatelessWidget {
   final Color color;
+  final Color pressedColor;
   final bool selected;
   final String label;
   final int position;
@@ -67,6 +72,7 @@ class _Day extends StatelessWidget {
   const _Day(
       {Key key,
       this.color,
+      this.pressedColor,
       this.label,
       this.selected = false,
       this.position,
@@ -75,23 +81,16 @@ class _Day extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ButtonThemeData buttonTheme = ButtonTheme.of(context);
     var borderColor = Colors.black;
-    if (ThemeData.estimateBrightnessForColor(
-            color ?? buttonTheme.colorScheme.background) ==
-        Brightness.dark) {
-      borderColor = Theme.of(context).accentColor;
-    }
     return RawMaterialButton(
       onPressed: () {
         print("position $position");
         this.onPressed(position);
       },
       elevation: selected ? 4 : 2,
-      constraints: BoxConstraints(minWidth: 30, minHeight: 30),
-      fillColor: color ?? buttonTheme.colorScheme.background,
-      textStyle: Theme.of(context).textTheme.button,
-      child: Text(label, style: TextStyle(color: borderColor)),
+      constraints: BoxConstraints(minWidth: 25, minHeight: 25),
+      fillColor: selected ? pressedColor : color,
+      child: Text(label),
       shape: CircleBorder(
           side: selected
               ? BorderSide(color: borderColor, width: 1)

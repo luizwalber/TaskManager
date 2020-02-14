@@ -1,5 +1,6 @@
-enum TaskStatus { FINISHED, ON_GOING, NOT_DONE }
+enum TaskStatus { DONE, PARTIALLY, NOT_DONE }
 enum TaskFrequency { DAILY, WEEKLY, MONTHLY, CUSTOM, EVERY_DAY, ONCE }
+enum ConfirmAction { ACCEPT, CANCEL }
 
 stringToEnum(enumType, String s) {
   if (enumType is TaskStatus)

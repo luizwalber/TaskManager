@@ -43,7 +43,7 @@ class DatabaseHelper {
             ${Task.titleCol} TEXT NOT NULL,
             ${Task.createdForDayCol} TEXT NOT NULL,
             ${Task.frequencyCol} TEXT NOT NULL,
-            ${Task.statusCol} TEXT NOT NULL,
+            ${Task.statusCol} TEXT,
             ${Task.timeSpentCol} TEXT,
             ${Task.useLocationCol} INTEGER NOT NULL,
             ${Task.locationCol} TEXT,

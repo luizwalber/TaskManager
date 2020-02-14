@@ -42,8 +42,78 @@ class MyApp extends StatelessWidget {
                 StoreProvider.of<AppState>(context)
                     .dispatch(getMonthlyTasks(DateTime.now().month));
               }),
+          '/1': (BuildContext context) => Test()
         },
       ),
+    );
+  }
+}
+
+class Test extends StatefulWidget {
+  Test({Key key}) : super(key: key);
+
+  @override
+  _TestState createState() => _TestState();
+}
+
+class _TestState extends State<Test> with TickerProviderStateMixin {
+  double _heigth = 100;
+  bool _selected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(children: <Widget>[
+        InkWell(
+            onTap: () => _onPressedTask(),
+            child: AnimatedContainer(
+                width: MediaQuery.of(context).size.width,
+//            height: _heigth,
+                decoration: BoxDecoration(
+                  border: Border.all(width: 0.8),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                duration: Duration(seconds: 1),
+                curve: Curves.fastOutSlowIn,
+                child: buildCardInfo())),
+        Expanded(
+          child: InkWell(
+              onTap: () => _onPressedTask(),
+              child: AnimatedContainer(
+                  width: MediaQuery.of(context).size.width,
+//            height: _heigth,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 0.8),
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 4.0),
+                  duration: Duration(seconds: 1),
+                  curve: Curves.fastOutSlowIn,
+                  child: buildCardInfo())),
+        ),
+      ]),
+    );
+  }
+
+  _onPressedTask() {
+    setState(() {
+      _heigth = _selected ? _heigth / 2 : _heigth * 2;
+      _selected = !_selected;
+    });
+  }
+
+  Column buildCardInfo() {
+    return Column(
+      children: <Widget>[
+        Text("123"),
+        Visibility(
+            visible: _selected,
+            child: Text(
+                "4fdg sdfg sdf gsdfg sdfg sdfgsdfg sdf gsdf gsd fg dsfg sdfg sdfg sdfg sd fgsd fg dfg sdfg sdfg sd sd fgs dfgs fgs fg sdfg sdf sdf gsd fg sdfg sdfg sd fgs dfg sdfg sdfg sdfg sdfgsdf gs gs fgsdfgsdf566"))
+      ],
     );
   }
 }

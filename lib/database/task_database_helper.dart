@@ -43,17 +43,39 @@ class TaskDatabaseHelper {
   }
 
   /// updates a task in the database
-  Future<int> update(Task task) async {
+  Future<int> updateAll(Task task) async {
     Database db = await _instance.database;
-    Map<String, dynamic> row = task.toMap();
-    return await db.update(Task.table, row,
-        where: '${Task.idCol} = ?', whereArgs: [task.id]);
+
+    return await db.update(
+      Task.table,
+      task.toMap(),
+      where: '${Task.idCol} = ?',
+      whereArgs: [task.id],
+    );
+  }
+
+  /// updates a task in the database
+  Future<int> updateStatus(int taskId, TaskStatus taskStatus) async {
+    Database db = await _instance.database;
+    String sql =
+        "UPDATE ${Task.table} SET ${Task.statusCol} = ? WHERE ${Task.idCol} = ?";
+
+    ///TODO pq n esta atualizando? fazer uns testes aqui.. isso esta irritando um pouquinho, impede de ver a andamento quando abre isso deixaria o app mais bonito (e tbm é um MUST)
+
+    Map<String, List<Task>> up = await getTasksNearMonthTasks(2);
+    int r = await db.rawUpdate(sql, [taskStatus.toString(), taskId]);
+    up = await getTasksNearMonthTasks(2);
+    print(up);
+    return r;
   }
 
   /// deletes a task from the database
   Future<int> delete(int id) async {
     Database db = await _instance.database;
-    return await db
-        .delete(Task.table, where: '${Task.idCol} = ?', whereArgs: [id]);
+    return await db.delete(
+      Task.table,
+      where: '${Task.idCol} = ?',
+      whereArgs: [id],
+    );
   }
 }
