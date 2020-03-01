@@ -164,8 +164,7 @@ class AddTaskFormState extends State<AddTaskForm> {
       visible: _currentFrequency == TaskFrequency.CUSTOM,
       child: Padding(
         padding: const EdgeInsets.all(0.0),
-        child: WeekdaySelector(
-            color: Colors.greenAccent, onPressed: _onPressedDayOfWeek),
+        child: WeekdaySelector(),
       ),
     );
   }
@@ -207,7 +206,7 @@ class AddTaskFormState extends State<AddTaskForm> {
           builder: (context, state) {
             return RaisedButton(
               color: Colors.blue,
-              onPressed: _submit,
+              onPressed: () => _submit(state.selectedDays),
               child: Text(
                 'Add Task',
                 style: submitButtonTextStyle,
@@ -263,7 +262,7 @@ class AddTaskFormState extends State<AddTaskForm> {
     });
   }
 
-  void _submit() {
+  void _submit(List<bool> selectedDays) {
     if (_formKey.currentState.validate()) {
       if (true) {
         Task task = Task(
@@ -275,7 +274,7 @@ class AddTaskFormState extends State<AddTaskForm> {
             month: widget.selectedDay.month,
             timeSpent: "00:00:00",
             location: '',
-            selectedDays: _selectedDays,
+            selectedDays: selectedDays,
             description: controllerDescription.text);
         print("task:\n$task");
         StoreProvider.of<AppState>(context).dispatch(addTask(task));

@@ -62,24 +62,10 @@ class _TestState extends State<Test> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(children: <Widget>[
-        InkWell(
-            onTap: () => _onPressedTask(),
-            child: AnimatedContainer(
-                width: MediaQuery.of(context).size.width,
-//            height: _heigth,
-                decoration: BoxDecoration(
-                  border: Border.all(width: 0.8),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                duration: Duration(seconds: 1),
-                curve: Curves.fastOutSlowIn,
-                child: buildCardInfo())),
-        Expanded(
-          child: InkWell(
+    return SafeArea(
+      child: Scaffold(
+        body: Column(children: <Widget>[
+          InkWell(
               onTap: () => _onPressedTask(),
               child: AnimatedContainer(
                   width: MediaQuery.of(context).size.width,
@@ -93,8 +79,24 @@ class _TestState extends State<Test> with TickerProviderStateMixin {
                   duration: Duration(seconds: 1),
                   curve: Curves.fastOutSlowIn,
                   child: buildCardInfo())),
-        ),
-      ]),
+          Expanded(
+            child: InkWell(
+                onTap: () => _onPressedTask(),
+                child: AnimatedContainer(
+                    width: MediaQuery.of(context).size.width,
+//            height: _heigth,
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 0.8),
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 4.0),
+                    duration: Duration(seconds: 1),
+                    curve: Curves.fastOutSlowIn,
+                    child: buildCardInfo())),
+          ),
+        ]),
+      ),
     );
   }
 

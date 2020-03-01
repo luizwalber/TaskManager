@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:task_manager/model/app_state.dart';
 
 /// TODO add theme to widget (and all the app by the way)
 class WeekdaySelector extends StatefulWidget {
@@ -10,86 +12,67 @@ class WeekdaySelector extends StatefulWidget {
   static const friday = 5;
   static const saturday = 6;
 
-  final Color color;
-  final Color pressedColor;
-  final Function(int) onPressed;
-
-  const WeekdaySelector(
-      {Key key, this.color, this.pressedColor, this.onPressed})
-      : super(key: key);
+  const WeekdaySelector();
 
   @override
   WeekdaySelectorState createState() => WeekdaySelectorState();
 }
 
 class WeekdaySelectorState extends State<WeekdaySelector> {
-  List<bool> _selectedDays;
-
   @override
   void initState() {
-    setState(() {
-      _selectedDays = [false, false, false, false, false, false, false];
-    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final days = <Widget>[];
-    Map<int, String> daysHash = {
-      WeekdaySelector.sunday: "D",
-      WeekdaySelector.monday: "S",
-      WeekdaySelector.tuesday: "T",
-      WeekdaySelector.wednesday: "Q",
-      WeekdaySelector.thursday: "Q",
-      WeekdaySelector.friday: "S",
-      WeekdaySelector.saturday: "S",
-    };
-    daysHash.forEach((value, label) {
-      print("value $value");
-      final Widget day = _Day(
-          color: widget.color,
-          pressedColor: Colors.yellow,
-          label: label,
-          selected: _selectedDays[value],
-          position: value,
-          onPressed: widget.onPressed(value));
-      days.add(day);
-    });
-    print(daysHash);
-    return Row(children: days, mainAxisAlignment: MainAxisAlignment.start);
+    return StoreConnector<AppState, AppState>(
+        converter: (store) => store.state,
+        builder: (context, state) {
+          return Row(
+              children: buildDays(state.selectedDays),
+              mainAxisAlignment: MainAxisAlignment.start);
+        });
   }
 }
 
+List<Widget> buildDays(List<bool> selectedDays) {
+  final days = <Widget>[];
+  Map<int, String> daysHash = {
+    WeekdaySelector.sunday: "D",
+    WeekdaySelector.monday: "S",
+    WeekdaySelector.tuesday: "T",
+    WeekdaySelector.wednesday: "Q",
+    WeekdaySelector.thursday: "Q",
+    WeekdaySelector.friday: "S",
+    WeekdaySelector.saturday: "S",
+  };
+  daysHash.forEach((value, label) {
+    print("value $value");
+    final Widget day =
+        _Day(label: label, position: value, selected: selectedDays[value]);
+    days.add(day);
+  });
+  print(daysHash);
+  return days;
+}
+
 class _Day extends StatelessWidget {
-  final Color color;
-  final Color pressedColor;
-  final bool selected;
   final String label;
   final int position;
-  final Function(int) onPressed;
+  final bool selected;
 
-  const _Day(
-      {Key key,
-      this.color,
-      this.pressedColor,
-      this.label,
-      this.selected = false,
-      this.position,
-      this.onPressed})
+  const _Day({Key key, this.label, this.position, this.selected})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var borderColor = Colors.black;
     return RawMaterialButton(
-      onPressed: () {
-        print("position $position");
-        this.onPressed(position);
-      },
+      onPressed: () {},
       elevation: selected ? 4 : 2,
       constraints: BoxConstraints(minWidth: 25, minHeight: 25),
-      fillColor: selected ? pressedColor : color,
+      fillColor: selected ? Colors.green : Colors.red,
       child: Text(label),
       shape: CircleBorder(
           side: selected
