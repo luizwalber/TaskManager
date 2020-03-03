@@ -10,14 +10,62 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/redux/reducers.dart';
 import 'package:task_manager/redux/thunks.dart';
+import 'package:task_manager/repository/task_repository.dart';
 import 'package:task_manager/ui/screens/home_page.dart';
 
 void main() {
-  final store = Store<AppState>(appReducer,
-      initialState: AppState.initial(),
-      middleware: [thunkMiddleware, LoggingMiddleware.printer()]);
-  initializeDateFormatting().then((_) => runApp(MyApp(store: store)));
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(TaskManager());
 }
+
+class TaskManager extends StatelessWidget {
+  final Store<AppState> store;
+
+  TaskManager({
+    Key key,
+    TaskRepository taskRepository,
+    UserRepository userRepository,
+  })  : store = Store<AppState>(
+          appReducer,
+          initialState: AppState.loading(),
+          middleware: createStoreTodosMiddleware(
+            taskRepository ??
+                FirestoreReactiveTodosRepository(Firestore.instance),
+            userRepository ?? FirebaseUserRepository(FirebaseAuth.instance),
+          ),
+        ),
+        super(key: key) {
+    store.dispatch(InitAppAction());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StoreProvider(
+      store: store,
+      child: MaterialApp(
+        onGenerateTitle: (context) =>
+            FirestoreReduxLocalizations.of(context).appTitle,
+        theme: ArchSampleTheme.theme,
+        localizationsDelegates: [
+          ArchSampleLocalizationsDelegate(),
+          FirestoreReduxLocalizationsDelegate(),
+        ],
+        routes: {
+          ArchSampleRoutes.home: (context) => HomeScreen(),
+          ArchSampleRoutes.addTodo: (context) => AddTodo(),
+        },
+      ),
+    );
+  }
+}
+
+//void main() {
+//  final store = Store<AppState>(appReducer,
+//      initialState: AppState.initial(),
+//      middleware: [thunkMiddleware, LoggingMiddleware.printer()]);
+//  initializeDateFormatting().then((_) => runApp(MyApp(store: store)));
+//}
 
 class MyApp extends StatelessWidget {
   final Store<AppState> store;
