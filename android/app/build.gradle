@@ -38,6 +38,7 @@ android {
     }
 
     defaultConfig {
+        multiDexEnabled true  //  <--- Enables multidex to support more than 64k java methods
         applicationId "com.example.task_manager"
         minSdkVersion 16
         targetSdkVersion 28

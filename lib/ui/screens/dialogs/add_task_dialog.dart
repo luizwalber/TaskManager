@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
-import 'package:task_manager/redux/thunks.dart';
+import 'package:task_manager/model/task_schema.dart';
+import 'package:task_manager/redux/actions/actions.dart';
 import 'package:task_manager/ui/widgets/weekday_selector.dart';
+import 'package:task_manager/utils/date_utils.dart';
 import 'package:task_manager/utils/enums.dart';
 import 'package:task_manager/utils/styles.dart';
 
@@ -55,7 +57,6 @@ class AddTaskForm extends StatefulWidget {
 }
 
 class AddTaskFormState extends State<AddTaskForm> {
-  // Note: This is a `GlobalKey<FormState>`
   final _formKey = GlobalKey<FormState>();
 
   bool _repeat;
@@ -264,25 +265,30 @@ class AddTaskFormState extends State<AddTaskForm> {
 
   void _submit(List<bool> selectedDays) {
     if (_formKey.currentState.validate()) {
-      if (true) {
-        Task task = Task(
-            title: controllerTitle.text,
-            createdForDay: widget.selectedDay,
-            frequency: _currentFrequency,
-            status: null,
-            useLocation: _useLocation,
-            month: widget.selectedDay.month,
-            timeSpent: "00:00:00",
-            location: '',
-            selectedDays: selectedDays,
-            description: controllerDescription.text);
-        print("task:\n$task");
-        StoreProvider.of<AppState>(context).dispatch(addTask(task));
-        Navigator.of(context).pop();
+      TaskSchema task = TaskSchema(
+        title: controllerTitle.text,
+        createdDay: widget.selectedDay,
+        useLocation: _useLocation,
+        description: controllerDescription.text,
+        frequency: null,
+        selectedDays: null,
+        useAlarm: false,
+        alarmTime: "",
+      );
+
+      if (widget.task == null) {
+        task.processedInMonths = {dateMonthHash(widget.selectedDay): true};
+
+        StoreProvider.of<AppState>(context).dispatch(AddTaskSchemaAction(task));
       } else {
-        print("task:\n");
-        //TODO there was some error in saving the task in database
+        task.id = widget.task.id;
+        task.alarmTime = widget.task.alarmTime;
+        task.location = widget.task.location;
+//        task.createdDay = widget.task.createdDay TODO think about a better solution
+        StoreProvider.of<AppState>(context)
+            .dispatch(UpdateTaskSchemaAction(task));
       }
+      Navigator.of(context).pop();
     }
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
-import 'package:task_manager/redux/thunks.dart';
+import 'package:task_manager/redux/actions/actions.dart';
 import 'package:task_manager/ui/screens/dialogs/add_task_dialog.dart';
 import 'package:task_manager/ui/screens/dialogs/simple_dialogs.dart';
 import 'package:task_manager/utils/enums.dart';
@@ -20,12 +20,13 @@ class TaskList extends StatefulWidget {
   _TaskListState createState() => _TaskListState();
 }
 
+// TODO não deve ter esse dailytaskstatus, pega da task mesmo
 class _TaskListState extends State<TaskList> {
-  int selectedTask;
-  Map<int, TaskStatus> dailyTaskStatus = {};
+  String selectedTask;
+  Map<String, TaskStatus> dailyTaskStatus = {};
 
   void initState() {
-    selectedTask = -1;
+    selectedTask = null;
   }
 
   @override
@@ -54,8 +55,7 @@ class _TaskListState extends State<TaskList> {
         child: Material(
           child: InkWell(
               onTap: () => _onPressedTask(task),
-              onLongPress: () =>
-                  addTaskDialog(context, task.createdForDay, task: task),
+              onLongPress: () => addTaskDialog(context, task.day, task: task),
               child: AnimatedContainer(
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
@@ -176,7 +176,7 @@ class _TaskListState extends State<TaskList> {
       "Are you sure want to delete task ${task.title}? this action can't be undone",
     );
     if (confirmation == ConfirmAction.ACCEPT) {
-      StoreProvider.of<AppState>(context).dispatch(deleteTask(task));
+      StoreProvider.of<AppState>(context).dispatch(DeleteTaskAction(task.id));
     }
   }
 
@@ -201,7 +201,7 @@ class _TaskListState extends State<TaskList> {
     print('New selected task id: ${task.id} title: ${task.title}');
     setState(() {
       if (selectedTask == task.id)
-        selectedTask = -1;
+        selectedTask = null;
       else
         selectedTask = task.id;
     });
@@ -234,8 +234,7 @@ class _TaskListState extends State<TaskList> {
       dailyTaskStatus.putIfAbsent(task.id, () => taskStatus);
     });
     task.status = taskStatus;
-    //TODO dispatch action to update the task
 
-    StoreProvider.of<AppState>(context).dispatch(updateTask(task));
+    StoreProvider.of<AppState>(context).dispatch(UpdateTaskAction(task));
   }
 }

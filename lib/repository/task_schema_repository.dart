@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:core';
 
-import 'package:task_manager/model/task.dart';
+import 'package:task_manager/model/task_schema.dart';
 
 // TODO texto copiado
 /// A data layer class works with reactive data sources, such as Firebase. This
@@ -13,6 +13,12 @@ import 'package:task_manager/model/task.dart';
 /// The domain layer should depend on this abstract class, and each app can
 /// inject the correct implementation depending on the environment, such as
 /// web or Flutter.
-abstract class Bla {
-  Future<void> addNewTask(TaskSchema task);
+abstract class TaskSchemaRepository {
+  Future<void> addTaskSchema(TaskSchema taskSchema);
+
+  Future<void> updateTaskSchema(TaskSchema taskSchema);
+
+  Future<void> deleteTaskSchema(String id);
+
+  Stream<List<TaskSchema>> getAllTaskSchema();
 }

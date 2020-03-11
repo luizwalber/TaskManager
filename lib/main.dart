@@ -1,39 +1,46 @@
 //  Copyright (c) 2019 Aleksander Woźniak
 //  Licensed under Apache License v2.0
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:redux/redux.dart';
-import 'package:redux_logging/redux_logging.dart';
-import 'package:redux_thunk/redux_thunk.dart';
+import 'package:task_manager/Service/task_schema_service.dart';
+import 'package:task_manager/Service/task_service.dart';
+import 'package:task_manager/Service/user_service.dart';
+import 'package:task_manager/middleware/middleware.dart';
 import 'package:task_manager/model/app_state.dart';
-import 'package:task_manager/redux/reducers.dart';
-import 'package:task_manager/redux/thunks.dart';
+import 'package:task_manager/redux/actions/actions.dart';
+import 'package:task_manager/redux/reducer.dart';
 import 'package:task_manager/repository/task_repository.dart';
+import 'package:task_manager/repository/task_schema_repository.dart';
+import 'package:task_manager/repository/user_repository.dart';
 import 'package:task_manager/ui/screens/home_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  runApp(TaskManager());
+  initializeDateFormatting('pt_br', null).then((_) => runApp(TaskManager()));
 }
 
 class TaskManager extends StatelessWidget {
   final Store<AppState> store;
 
+  final String _title = 'Task Manager';
+
   TaskManager({
     Key key,
     TaskRepository taskRepository,
+    TaskSchemaRepository taskSchemaRepository,
     UserRepository userRepository,
   })  : store = Store<AppState>(
           appReducer,
-          initialState: AppState.loading(),
-          middleware: createStoreTodosMiddleware(
-            taskRepository ??
-                FirestoreReactiveTodosRepository(Firestore.instance),
-            userRepository ?? FirebaseUserRepository(FirebaseAuth.instance),
-          ),
+          initialState: AppState.initial(),
+          middleware: taskMiddleware(
+              taskRepository ?? TaskService(Firestore.instance),
+              taskSchemaRepository ?? TaskSchemaService(Firestore.instance),
+              userRepository ?? UserService(FirebaseAuth.instance)),
         ),
         super(key: key) {
     store.dispatch(InitAppAction());
@@ -44,16 +51,10 @@ class TaskManager extends StatelessWidget {
     return StoreProvider(
       store: store,
       child: MaterialApp(
-        onGenerateTitle: (context) =>
-            FirestoreReduxLocalizations.of(context).appTitle,
-        theme: ArchSampleTheme.theme,
-        localizationsDelegates: [
-          ArchSampleLocalizationsDelegate(),
-          FirestoreReduxLocalizationsDelegate(),
-        ],
+        title: _title,
+        debugShowCheckedModeBanner: false,
         routes: {
-          ArchSampleRoutes.home: (context) => HomeScreen(),
-          ArchSampleRoutes.addTodo: (context) => AddTodo(),
+          '/': (context) => HomePage(title: _title),
         },
       ),
     );
@@ -66,7 +67,7 @@ class TaskManager extends StatelessWidget {
 //      middleware: [thunkMiddleware, LoggingMiddleware.printer()]);
 //  initializeDateFormatting().then((_) => runApp(MyApp(store: store)));
 //}
-
+/*
 class MyApp extends StatelessWidget {
   final Store<AppState> store;
   final String _title = 'Task Manager';
@@ -167,3 +168,6 @@ class _TestState extends State<Test> with TickerProviderStateMixin {
     );
   }
 }
+
+// - Action -
+*/

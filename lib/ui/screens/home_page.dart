@@ -1,10 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
-import 'package:task_manager/redux/thunks.dart';
 import 'package:task_manager/ui/widgets/task_list.dart';
 import 'package:task_manager/utils/date_utils.dart';
 import 'package:task_manager/utils/enums.dart';
@@ -12,9 +12,8 @@ import 'package:task_manager/utils/enums.dart';
 // TODO show day in the middle of the divider between the calendar and the tasks
 class HomePage extends StatefulWidget {
   final String title;
-  final void Function() onInit;
 
-  HomePage({Key key, this.title, this.onInit}) : super(key: key);
+  HomePage({Key key, this.title}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -32,8 +31,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void initState() {
     super.initState();
-    widget.onInit();
-
     _selectedDay = DateTime.now(); //TODO set state in the case?
 
     _calendarController = CalendarController();
@@ -90,7 +87,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     /// using the method that is called when the visible days is changed, but if the calendar shows
     /// outside months in the visible days will get the wrong month, the code bellow fix that
     int month = last.day < 7 ? last.month - 1 : last.month;
-    StoreProvider.of<AppState>(context).dispatch(getMonthlyTasks(month));
+//    StoreProvider.of<AppState>(context).dispatch(LoadTaskAction(month));
   }
 
   CalendarBuilders calendarBuilders() {
@@ -109,7 +106,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         builder: (_, state) {
           return Expanded(
               child: TaskList(
-                  selectedTasks: state.monthlyTasks[dateDayHash(_selectedDay)],
+                  selectedTasks: state.monthlyTasks != null
+                      ? state.monthlyTasks[dateDayHash(_selectedDay)]
+                      : null,
                   selectedDay: _selectedDay));
         });
   }
@@ -220,14 +219,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Map<DateTime, List<Task>> extractEvents(AppState state) {
     Map<DateTime, List<Task>> events = {};
-    state.monthlyTasks.forEach((dayHash, tasks) {
+
+    state.monthlyTasks?.forEach((dayHash, tasks) {
       final DateTime date = DateTime.parse(dayHash);
       events[date] = tasks;
     });
+
     return events;
   }
 
-  Widget _buildTaskNumber(DateTime date, List tasks) {
+  Widget _buildTaskCounter(DateTime date, List tasks) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
@@ -249,38 +250,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildTaskStatusFlag(DateTime date, List<Task> tasks) {
-    TaskStatus _selectedDayTasksFlag;
-    bool hasOneDone = false;
-    tasks.forEach((Task task) {
-      if (task.status == TaskStatus.NOT_DONE) {
-        if (!hasOneDone) {
-          _selectedDayTasksFlag = TaskStatus.NOT_DONE;
-        } else {
-          _selectedDayTasksFlag = TaskStatus.PARTIALLY;
-        }
-      } else if (task.status == TaskStatus.PARTIALLY &&
-          _selectedDayTasksFlag != TaskStatus.NOT_DONE) {
-        _selectedDayTasksFlag = TaskStatus.PARTIALLY;
-      } else if (task.status == TaskStatus.DONE) {
-        if (_selectedDayTasksFlag == null)
-          _selectedDayTasksFlag = TaskStatus.DONE;
-        else
-          _selectedDayTasksFlag = TaskStatus.PARTIALLY;
-        hasOneDone = true;
-      }
-    });
-    if (_selectedDayTasksFlag == null) return Text('');
+    Color color = Colors.transparent;
+    Map<TaskStatus, List<Task>> map =
+        groupBy(tasks, (Task task) => task.status);
+
+    if (map[TaskStatus.DONE] != null &&
+        map[TaskStatus.PARTIALLY] == null &&
+        map[TaskStatus.NOT_DONE] == null) {
+      if (map[TaskStatus.EMPTY] != null)
+        color = Colors.orange;
+      else
+        color = Colors.green;
+    } else if (map[TaskStatus.PARTIALLY] != null) {
+      color = Colors.orange;
+    } else if (map[TaskStatus.NOT_DONE] != null) {
+      color = Colors.red;
+    }
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0),
-        color: _selectedDayTasksFlag == TaskStatus.DONE
-            ? Colors.green
-            : _selectedDayTasksFlag == TaskStatus.PARTIALLY
-                ? Colors.orange
-                : Colors.redAccent,
-      ),
+          borderRadius: BorderRadius.circular(12.0), color: color),
       width: 16.0,
       height: 16.0,
     );
@@ -294,7 +284,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         Positioned(
           right: 1,
           bottom: 1,
-          child: _buildTaskNumber(date, tasks),
+          child: _buildTaskCounter(date, tasks),
         ),
       );
       children.add(

@@ -26,16 +26,22 @@ dependencies:
   table_calendar: ^2.0.1 # calendar widget
   sqflite: ^1.2.0 # database lib
   provider: ^3.0.0 # helps with redux
-  flutter_redux: 0.5.3 # helps with redux
-  redux_thunk: 0.2.1 # helps with redux
-  redux_logging: 0.3.0 # helps with redux
+  redux: ^4.0.0
+  flutter_redux: ^0.6.0 # helps with redux
+  redux_logging: ^0.4.0 # helps with redux
+  redux_epics: ^0.13.0
   intl: ^0.16.1 # helps with date formatting
   styled_widget: ^0.0.6 # TODO PLEEEEASE facilitates styling Eg: Text('').textColor(Colors.white).bold().elevation(10)....
   collection: ^1.14.11 # Collections and utilities functions and classes related to collections
-  firebase_core: ^0.4.4 # library to connect with firebase
+  cloud_firestore: ^0.13.4
+  firebase_database: ^3.1.1 # library to connect with firebase
   firebase_analytics: ^5.0.11 # support google analytics
+  rxdart: ^0.23.1
+  rxdart_codemod: ^0.1.5
+  firebase_auth: ^0.15.5+2
 
 dev_dependencies:
+  cloud_firestore: any
   flutter_test:
     sdk: flutter
 

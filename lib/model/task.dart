@@ -1,85 +1,85 @@
-import 'package:task_manager/model/weekdays.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:task_manager/utils/enums.dart';
 
+/// The actual task event
 class Task {
-  int id;
+  String id;
+  String schemaId;
   String title;
-  DateTime createdForDay;
-  TaskFrequency frequency;
+  String description;
+  DateTime day;
   TaskStatus status;
   String timeSpent;
   bool useLocation;
   String location;
-  List<bool> selectedDays;
-  String description;
-  int month;
+  bool useAlarm;
+  String alarmTime;
 
-  /// I need to Query the events by the months to avoid loading all of them every time
-  /// but SqfLite doesn't support Dates, I didn't know any way other than this to do this query
-
-  /// didn't find a better way to access the column with sqflite
   static final String table = "task";
 
   static final String idCol = "id";
-  static final String createdForDayCol = "day";
+  static final String schemaIdCol = "schemaId";
   static final String titleCol = "title";
-  static final String statusCol = "status";
-  static final String timeSpentCol = "time_spent";
-  static final String useLocationCol = "use_location";
-  static final String locationCol = "location";
-  static final String frequencyCol = "frequency";
   static final String descriptionCol = "description";
-  static final String monthCol = "month";
+  static final String dayCol = "day";
+  static final String statusCol = "status";
+  static final String timeSpentCol = "timeSpent";
+  static final String useLocationCol = "useLocation";
+  static final String locationCol = "location";
+  static final String useAlarmCol = "useAlarm";
+  static final String alarmTimeCol = "alarmTime";
 
   Task(
       {this.id,
-      this.createdForDay,
+      this.schemaId,
       this.title,
+      this.description,
+      this.day,
       this.status,
       this.timeSpent,
-      this.frequency,
-      this.selectedDays,
-      this.location,
       this.useLocation,
-      this.description,
-      this.month});
+      this.location,
+      this.useAlarm,
+      this.alarmTime});
 
   Map<String, dynamic> toMap() {
-    Map<String, dynamic> result = {
-      idCol: id,
-      createdForDayCol: createdForDay.toIso8601String(),
-      titleCol: title, // TODO when testing check null variables
-      statusCol: status.toString(),
-      timeSpentCol: timeSpent.toString(),
-      frequencyCol: frequency.toString(),
-      useLocationCol: useLocation,
-      locationCol: location,
-      descriptionCol: description,
-      monthCol: month
-    };
+    Map<String, dynamic> result = {};
 
-    if (selectedDays != null && selectedDays.length == 7)
-      result.addAll(Weekdays(selectedDays).toMap());
+    // doing this way I can sent only the not null data, in the future I'll add exceptions like 'title' must not be null etc etc
+    if (id != null) result[idCol] = id;
+    if (title != null) result[titleCol] = title;
+    if (schemaId != null) result[schemaIdCol] = schemaId;
+    if (description != null) result[descriptionCol] = description;
+    if (day != null)
+      result[dayCol] =
+          Timestamp.fromMicrosecondsSinceEpoch(day.microsecondsSinceEpoch);
+    if (status != null) result[statusCol] = status.toString();
+    if (timeSpent != null) result[timeSpentCol] = timeSpent;
+    if (useLocation != null) result[useLocationCol] = useLocation;
+    if (location != null) result[locationCol] = location;
+    if (useAlarm != null) result[useAlarmCol] = useAlarm;
+    if (alarmTime != null) result[alarmTimeCol] = alarmTime;
 
     return result;
   }
 
-  Task.fromMap(Map<String, dynamic> map) {
-    this.id = map[idCol];
-    this.createdForDay = DateTime.parse(map[createdForDayCol]);
-    this.title = map[titleCol];
-    this.status = stringToEnum(TaskStatus, map[statusCol]);
-    this.timeSpent = map[timeSpentCol];
-    this.frequency = stringToEnum(TaskStatus, map[frequencyCol]);
-    this.useLocation = map[useLocationCol] != 0;
-    this.location = map[locationCol];
-    this.description = map[descriptionCol];
-    this.month = map[monthCol];
-    this.selectedDays = Weekdays.fromMap(map).selectedDays;
+  Task.fromFirestore(doc) {
+    this.id = doc.documentID;
+    this.schemaId = doc[schemaIdCol];
+    this.title = doc[titleCol];
+    this.description = doc[descriptionCol];
+    this.day =
+        DateTime.fromMicrosecondsSinceEpoch(doc[dayCol].microsecondsSinceEpoch);
+    this.status = stringToEnum(TaskStatus.values, doc[statusCol]);
+    this.timeSpent = doc[timeSpentCol];
+    this.location = doc[locationCol];
+    this.useLocation = doc[useLocationCol] ?? false;
+    this.useAlarm = doc[useAlarmCol] ?? false;
+    this.alarmTime = doc[alarmTimeCol];
   }
 
   @override
-  int get hashCode => id;
+  int get hashCode => id.hashCode;
 
   @override
   bool operator ==(Object other) => other is Task && other.id == id;
