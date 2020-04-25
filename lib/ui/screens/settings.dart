@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:task_manager/locale/app_localization.dart';
+import 'package:i18n_extension/default.i18n.dart';
+import 'package:i18n_extension/i18n_widget.dart';
 import 'package:task_manager/model/app_state.dart';
 
 class Settings extends StatefulWidget {
@@ -47,7 +48,7 @@ class _SettingsState extends State<Settings> {
       children: <Widget>[
         Row(
           children: <Widget>[
-            Text(AppLocalization.of(context).currentLanguage),
+            Text("Current language:".i18n),
             StoreConnector<AppState, AppState>(
                 converter: (store) => store.state,
                 builder: (context, state) {
@@ -59,11 +60,11 @@ class _SettingsState extends State<Settings> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             RaisedButton(
-              child: Text(AppLocalization.of(context).portuguese),
+              child: Text("Portuguese".i18n),
               onPressed: () => changeLanguage(context, Locale('pt', 'BR')),
             ),
             RaisedButton(
-              child: Text(AppLocalization.of(context).english),
+              child: Text("English".i18n),
               onPressed: () => changeLanguage(context, Locale('en', 'US')),
             ),
           ],
@@ -74,9 +75,7 @@ class _SettingsState extends State<Settings> {
 
   changeLanguage(BuildContext context, Locale locale) {
     print(locale.languageCode);
-    setState(() {
-      AppLocalization.load(locale);
-    });
+    I18n.of(context).locale = locale;
 //    StoreProvider.of<AppState>(context)
 //        .dispatch(ChangeLocaleAction(Locale(language)));
   }
@@ -92,8 +91,7 @@ class _SettingsState extends State<Settings> {
   AppBar _appBar() {
     return AppBar(
         title: new Center(
-            child: new Text(AppLocalization.of(context).settings,
-                textAlign: TextAlign.center)));
+            child: new Text("Settings".i18n, textAlign: TextAlign.center)));
   }
 }
 

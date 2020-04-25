@@ -7,12 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:i18n_extension/i18n_widget.dart';
 import 'package:redux/redux.dart';
 import 'package:task_manager/Service/locale_service.dart';
 import 'package:task_manager/Service/task_schema_service.dart';
 import 'package:task_manager/Service/task_service.dart';
 import 'package:task_manager/Service/user_service.dart';
-import 'package:task_manager/locale/app_localization.dart';
 import 'package:task_manager/middleware/middleware.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/redux/actions/actions.dart';
@@ -51,9 +51,6 @@ class TaskManager extends StatelessWidget {
     store.dispatch(InitAppAction());
   }
 
-  AppLocalizationDelegate _localeOverrideDelegate =
-      AppLocalizationDelegate(Locale('pt', 'BR'));
-
   @override
   Widget build(BuildContext context) {
     return StoreProvider(
@@ -67,12 +64,22 @@ class TaskManager extends StatelessWidget {
           localizationsDelegates: [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
-            _localeOverrideDelegate,
+            GlobalCupertinoLocalizations.delegate,
           ],
           debugShowCheckedModeBanner: false,
           routes: {
-            '/': (context) => HomePage(),
-            '/settings': (context) => Settings(),
+            '/': (context) {
+              return I18n(
+                //initialLocale: Locale("en", "US"), //not defined = system locale
+                child: HomePage(),
+              );
+            },
+            '/settings': (context) {
+              return I18n(
+                child: Settings(),
+                //initialLocale: Locale("pt", "BR"),
+              );
+            },
           },
         ),
       ),

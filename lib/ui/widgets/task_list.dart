@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:task_manager/locale/app_localization.dart';
+import 'package:i18n_extension/default.i18n.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
 import 'package:task_manager/redux/actions/actions.dart';
@@ -112,7 +112,7 @@ class _TaskListState extends State<TaskList> {
               child: RaisedButton.icon(
                 color: Colors.lightBlue[100],
                 icon: Icon(Icons.map),
-                label: Text(AppLocalization.of(context).setLocation),
+                label: Text("Set Location".i18n),
                 onPressed: () => {},
               ),
             ),
@@ -173,8 +173,8 @@ class _TaskListState extends State<TaskList> {
   void _deleteTask(BuildContext context, Task task) async {
     ConfirmAction confirmation = await confirmDialog(
       context,
-      AppLocalization.of(context).deleteSchemaTitle + ' ${task.title}',
-      AppLocalization.of(context).deleteSchemaDescription + "${task.title}?",
+      "Delete Task ".i18n + ' ${task.title}',
+      "Are you sure you want to delete the task ".i18n + "${task.title}?",
     );
     if (confirmation == ConfirmAction.ACCEPT) {
       StoreProvider.of<AppState>(context)

@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:i18n_extension/default.i18n.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:task_manager/locale/app_localization.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
 import 'package:task_manager/redux/actions/actions.dart';
@@ -110,8 +110,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   AppBar _appBar() {
     return AppBar(
         title: new Center(
-            child: new Text(AppLocalization.of(context).taskManagerTitle,
-                textAlign: TextAlign.center)),
+            child: new Text("Task Manager".i18n, textAlign: TextAlign.center)),
         actions: <Widget>[_popupMenu()]);
   }
 
@@ -120,7 +119,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       onSelected: choiceAction,
       itemBuilder: (BuildContext context) {
         return [
-          AppLocalization.of(context).settings,
+          "Settings".i18n,
         ].map((String choice) {
           return PopupMenuItem<String>(
             value: choice,
@@ -305,7 +304,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void choiceAction(String choice) {
-    if (choice == AppLocalization.of(context).settings) {
+    if (choice == "Settings".i18n) {
       Navigator.pushNamed(context, '/settings');
     }
   }

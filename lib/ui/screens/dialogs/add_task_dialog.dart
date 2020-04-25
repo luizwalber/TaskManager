@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:task_manager/locale/app_localization.dart';
+import 'package:i18n_extension/default.i18n.dart';
 import 'package:task_manager/model/User.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
@@ -31,7 +31,7 @@ void addTaskDialog(BuildContext context, DateTime selectedDay, {Task task}) {
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30))),
               child: Text(
-                AppLocalization.of(context).taskDialog,
+                "Task Dialog".i18n,
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: 18,
@@ -122,8 +122,8 @@ class AddTaskFormState extends State<AddTaskForm> {
       child: TextFormField(
         decoration: InputDecoration(
           icon: Icon(Icons.assignment),
-          hintText: AppLocalization.of(context).taskTitlePlaceholder,
-          labelText: AppLocalization.of(context).taskTitleLabel,
+          hintText: "What is the title?".i18n,
+          labelText: "Title *".i18n,
         ),
         validator: _validatorTitle,
         onSaved: _onSavedTitle,
@@ -137,7 +137,7 @@ class AddTaskFormState extends State<AddTaskForm> {
       padding: edgesBtweenForm,
       child: MergeSemantics(
         child: ListTile(
-            title: Text(AppLocalization.of(context).repeat),
+            title: Text("repeat".i18n),
             trailing:
                 CupertinoSwitch(value: _repeat, onChanged: _onChangedRepeat)),
       ),
@@ -150,7 +150,7 @@ class AddTaskFormState extends State<AddTaskForm> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          Text(AppLocalization.of(context).frequency),
+          Text("frequency".i18n),
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(7.0),
@@ -183,7 +183,7 @@ class AddTaskFormState extends State<AddTaskForm> {
       padding: edgesBtweenForm,
       child: MergeSemantics(
         child: ListTile(
-            title: Text(AppLocalization.of(context).useLocation),
+            title: Text("Use Location".i18n),
             trailing: CupertinoSwitch(
                 value: _useLocation, onChanged: _onChangedUseLocation)),
       ),
@@ -199,8 +199,8 @@ class AddTaskFormState extends State<AddTaskForm> {
         maxLines: null,
         decoration: InputDecoration(
           icon: Icon(Icons.assignment),
-          hintText: AppLocalization.of(context).taskDescriptionPlaceholder,
-          labelText: AppLocalization.of(context).taskDescriptionLabel,
+          hintText: "What is the task description".i18n,
+          labelText: "Description".i18n,
         ),
         onSaved: _onSavedTitle,
       ),
@@ -217,7 +217,7 @@ class AddTaskFormState extends State<AddTaskForm> {
               color: Colors.blue,
               onPressed: () => _submit(state.selectedDays, state.loggedUser),
               child: Text(
-                AppLocalization.of(context).submitTask,
+                "Add Task".i18n,
                 style: submitButtonTextStyle,
               ),
             );
@@ -257,7 +257,7 @@ class AddTaskFormState extends State<AddTaskForm> {
   }
 
   String _validatorTitle(title) {
-    if (title.isEmpty) return AppLocalization.of(context).titleEmpty;
+    if (title.isEmpty) return "Title must not be empty".i18n;
     return null;
   }
 

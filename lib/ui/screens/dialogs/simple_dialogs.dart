@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:task_manager/locale/app_localization.dart';
+import 'package:i18n_extension/default.i18n.dart';
 import 'package:task_manager/utils/enums.dart';
 
 Future<ConfirmAction> confirmDialog(
@@ -15,13 +15,13 @@ Future<ConfirmAction> confirmDialog(
         content: Text(description),
         actions: <Widget>[
           FlatButton(
-            child: Text(AppLocalization.of(context).cancel),
+            child: Text("Cancel".i18n),
             onPressed: () {
               Navigator.of(context).pop(ConfirmAction.CANCEL);
             },
           ),
           FlatButton(
-            child: Text(AppLocalization.of(context).accept),
+            child: Text("Accept".i18n),
             onPressed: () {
               Navigator.of(context).pop(ConfirmAction.ACCEPT);
             },
