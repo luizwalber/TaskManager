@@ -1,0 +1,138 @@
+{
+  "@@last_modified": "2020-04-23T23:42:22.685781",
+  "taskManagerTitle": "Task Manager",
+  "@taskManagerTitle": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "taskDialog": "Task Dialog",
+  "@taskDialog": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "taskTitlePlaceholder": "What is the title?",
+  "@taskTitlePlaceholder": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "taskTitleLabel": "Title *",
+  "@taskTitleLabel": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "repeat": "Repeat",
+  "@repeat": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "frequency": "Frequency",
+  "@frequency": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "useLocation": "Use Location",
+  "@useLocation": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "taskDescriptionPlaceholder": "What is the task description",
+  "@taskDescriptionPlaceholder": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "taskDescriptionLabel": "Description",
+  "@taskDescriptionLabel": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "submitTask": "Submit Task",
+  "@submitTask": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "titleEmpty": "Title must not be empty",
+  "@titleEmpty": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "accept": "Accept",
+  "@accept": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "settings": "Settings",
+  "@settings": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteSchemaTitle": "Delete Task",
+  "@deleteSchemaTitle": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteSchemaDescription": "Are you sure you want to delete the task ",
+  "@deleteSchemaDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "setLocation": "Set Location",
+  "@setLocation": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "language": "Language",
+  "@language": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "currentLanguage": "Current language: ",
+  "@currentLanguage": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "portuguese": "Portuguese",
+  "@portuguese": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "english": "English",
+  "@english": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "monthly": "Monthly",
+  "@monthly": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "daily": "Daily",
+  "@daily": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "weekly": "Weekly",
+  "@weekly": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "custom": "Custom",
+  "@custom": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "once": "Once",
+  "@once": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "annually": "Annually",
+  "@annually": {
+    "type": "text",
+    "placeholders": {}
+  }
+}

@@ -15,8 +15,7 @@ class TaskSchema {
   String alarmTime;
   String alarmRingtone;
   Map<String, bool> processedInMonths;
-
-  /// [processedInMonths] the key is a hash to represent the month and the value is a boolean indicating if this month needs to be processed
+  String createdBy;
 
   static final String table = "task_schema";
 
@@ -32,6 +31,7 @@ class TaskSchema {
   static final String alarmTimeCol = "alarmTime";
   static final String alarmRingtoneCol = "alarmRingtone";
   static final String processedInMonthsCol = "processedInMonths";
+  static final String createdByCol = "createdBy";
 
   TaskSchema(
       {this.id,
@@ -45,7 +45,8 @@ class TaskSchema {
       this.useAlarm,
       this.alarmRingtone,
       this.alarmTime,
-      this.processedInMonths});
+      this.processedInMonths,
+      this.createdBy});
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> result = {};
@@ -67,6 +68,7 @@ class TaskSchema {
       result[processedInMonthsCol] = processedInMonths;
     if (selectedDays != null && selectedDays.length == 7)
       result[selectedDaysCol] = selectedDays;
+    if (createdBy != null) result[createdByCol] = createdBy;
 
     return result;
   }
@@ -85,6 +87,7 @@ class TaskSchema {
     this.alarmTime = doc[alarmTimeCol];
     this.processedInMonths = Map.from(doc[processedInMonthsCol]);
     this.selectedDays = doc[selectedDaysCol];
+    this.createdBy = doc[createdByCol];
   }
 
   @override

@@ -3,17 +3,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:task_manager/locale/app_localization.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
+import 'package:task_manager/redux/actions/actions.dart';
 import 'package:task_manager/ui/widgets/task_list.dart';
 import 'package:task_manager/utils/date_utils.dart';
 import 'package:task_manager/utils/enums.dart';
 
 // TODO show day in the middle of the divider between the calendar and the tasks
+// TODO when the month has 6 weeks the screen breaks (out of bound)
 class HomePage extends StatefulWidget {
-  final String title;
-
-  HomePage({Key key, this.title}) : super(key: key);
+  HomePage({Key key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -24,10 +25,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   AnimationController _animationController;
   CalendarController _calendarController;
-
-  static const String _weeklyGoals = 'Weekly Goals';
-  static const String _dailyGoals = 'Daily Goals';
-  static const String _settings = 'Settings';
 
   void initState() {
     super.initState();
@@ -70,7 +67,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         builder: (context, state) {
           return TableCalendar(
             rowHeight: 50,
-            locale: 'pt_br',
+            locale: Localizations.localeOf(context).languageCode,
+            //TODO get locale
             calendarController: _calendarController,
             events: extractEvents(state),
             calendarStyle: _calendarStyle(),
@@ -83,16 +81,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _onMonthChange(DateTime first, DateTime last, CalendarFormat format) {
-    /// I couldn't find any method to trigger the month change event, I could only update the monthly tasks
-    /// using the method that is called when the visible days is changed, but if the calendar shows
-    /// outside months in the visible days will get the wrong month, the code bellow fix that
-    int month = last.day < 7 ? last.month - 1 : last.month;
-//    StoreProvider.of<AppState>(context).dispatch(LoadTaskAction(month));
+    StoreProvider.of<AppState>(context)
+        .dispatch(ChangeMonthAction(first.year, first.month));
   }
 
   CalendarBuilders calendarBuilders() {
     return CalendarBuilders(
-      //dayBuilder: _dayBuilder,
       selectedDayBuilder: _onSelectDay,
       todayDayBuilder: _todayBuilder,
       markersBuilder: _markersBuilder,
@@ -108,7 +102,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               child: TaskList(
                   selectedTasks: state.monthlyTasks != null
                       ? state.monthlyTasks[dateDayHash(_selectedDay)]
-                      : null,
+                      : '',
                   selectedDay: _selectedDay));
         });
   }
@@ -116,7 +110,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   AppBar _appBar() {
     return AppBar(
         title: new Center(
-            child: new Text(widget.title, textAlign: TextAlign.center)),
+            child: new Text(AppLocalization.of(context).taskManagerTitle,
+                textAlign: TextAlign.center)),
         actions: <Widget>[_popupMenu()]);
   }
 
@@ -124,7 +119,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return PopupMenuButton<String>(
       onSelected: choiceAction,
       itemBuilder: (BuildContext context) {
-        return [_weeklyGoals, _dailyGoals, _settings].map((String choice) {
+        return [
+          AppLocalization.of(context).settings,
+        ].map((String choice) {
           return PopupMenuItem<String>(
             value: choice,
             child: Text(choice),
@@ -213,7 +210,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   CalendarStyle _calendarStyle() {
     return CalendarStyle(
-        outsideDaysVisible: true,
+        outsideDaysVisible: false,
         weekendStyle: TextStyle().copyWith(color: Colors.pinkAccent));
   }
 
@@ -308,12 +305,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void choiceAction(String choice) {
-    if (choice == _weeklyGoals) {
-      print('_weeklyGoals');
-    } else if (choice == _dailyGoals) {
-      print('_dailyGoals');
-    } else if (choice == _settings) {
-      print('_settings');
+    if (choice == AppLocalization.of(context).settings) {
+      Navigator.pushNamed(context, '/settings');
     }
   }
 }

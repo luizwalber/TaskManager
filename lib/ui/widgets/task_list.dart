@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:task_manager/locale/app_localization.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
 import 'package:task_manager/redux/actions/actions.dart';
@@ -111,7 +112,7 @@ class _TaskListState extends State<TaskList> {
               child: RaisedButton.icon(
                 color: Colors.lightBlue[100],
                 icon: Icon(Icons.map),
-                label: Text("Set Location"),
+                label: Text(AppLocalization.of(context).setLocation),
                 onPressed: () => {},
               ),
             ),
@@ -172,11 +173,12 @@ class _TaskListState extends State<TaskList> {
   void _deleteTask(BuildContext context, Task task) async {
     ConfirmAction confirmation = await confirmDialog(
       context,
-      "Delete Task ${task.title}",
-      "Are you sure want to delete task ${task.title}? this action can't be undone",
+      AppLocalization.of(context).deleteSchemaTitle + ' ${task.title}',
+      AppLocalization.of(context).deleteSchemaDescription + "${task.title}?",
     );
     if (confirmation == ConfirmAction.ACCEPT) {
-      StoreProvider.of<AppState>(context).dispatch(DeleteTaskAction(task.id));
+      StoreProvider.of<AppState>(context)
+          .dispatch(DeleteTaskAction(task.schemaId));
     }
   }
 
@@ -198,7 +200,6 @@ class _TaskListState extends State<TaskList> {
   }
 
   _onPressedTask(Task task) {
-    print('New selected task id: ${task.id} title: ${task.title}');
     setState(() {
       if (selectedTask == task.id)
         selectedTask = null;

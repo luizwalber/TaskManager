@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:task_manager/model/User.dart';
 import 'package:task_manager/model/task.dart';
 import 'package:task_manager/model/task_schema.dart';
 
@@ -8,15 +11,12 @@ class InitAppAction {
   }
 }
 
-class GetTasksNearMonth {
-  int month;
-  int year;
-
-  GetTasksNearMonth(this.month, this.year);
+class StartTaskListener {
+  StartTaskListener();
 
   @override
   String toString() {
-    return 'StartMonthListener {month: $month, year: $year';
+    return 'StartTaskListener {}';
   }
 }
 
@@ -25,7 +25,7 @@ class StartSchemaListener {
 
   @override
   String toString() {
-    return 'StartSchemaListener {';
+    return 'StartSchemaListener {}';
   }
 }
 
@@ -36,7 +36,7 @@ class AddTaskAction {
 
   @override
   String toString() {
-    return 'AddTaskAction{todo: $task}';
+    return 'AddTaskAction{task: $task}';
   }
 }
 
@@ -47,7 +47,7 @@ class AddTaskInState {
 
   @override
   String toString() {
-    return 'AddTaskAction{todo: $task}';
+    return 'AddTaskInState{task: $task}';
   }
 }
 
@@ -58,18 +58,18 @@ class UpdateTaskAction {
 
   @override
   String toString() {
-    return 'UpdateTaskAction{todo: $task}';
+    return 'UpdateTaskAction{task: $task}';
   }
 }
 
 class DeleteTaskAction {
-  final String id;
+  final String schemaId;
 
-  DeleteTaskAction(this.id);
+  DeleteTaskAction(this.schemaId);
 
   @override
   String toString() {
-    return 'DeleteTaskAction{todos: $id}';
+    return 'DeleteTaskAction{schemaId: $schemaId}';
   }
 }
 
@@ -80,7 +80,7 @@ class LoadTasksAction {
 
   @override
   String toString() {
-    return 'TransformTaskAction{todos: $tasks}';
+    return 'LoadTasksAction{tasks: $tasks}';
   }
 }
 
@@ -91,7 +91,7 @@ class LoadTaskSchemaAction {
 
   @override
   String toString() {
-    return 'TransformTaskAction{todos: $taskSchema}';
+    return 'LoadTaskSchemaAction{taskSchema: $taskSchema}';
   }
 }
 
@@ -102,7 +102,7 @@ class AddTaskSchemaAction {
 
   @override
   String toString() {
-    return 'UpdateTaskSchemaAction{todo: $taskSchema}';
+    return 'AddTaskSchemaAction{taskSchema: $taskSchema}';
   }
 }
 
@@ -113,7 +113,19 @@ class UpdateTaskSchemaAction {
 
   @override
   String toString() {
-    return 'UpdateTaskSchemaAction{todo: $taskSchema}';
+    return 'UpdateTaskSchemaAction{taskSchema: $taskSchema}';
+  }
+}
+
+class ChangeMonthAction {
+  final int year;
+  final int month;
+
+  ChangeMonthAction(this.year, this.month);
+
+  @override
+  String toString() {
+    return 'ChangeMonthAction{ Year: $year Month: $month}';
   }
 }
 
@@ -124,20 +136,50 @@ class DeleteTaskSchemaAction {
 
   @override
   String toString() {
-    return 'DeleteTaskSchemaAction{todos: $id}';
+    return 'DeleteTaskSchemaAction {id: $id}';
   }
 }
 
-class StartLoading {
+class LoadUserAction {
+  final User user;
+
+  LoadUserAction(this.user);
+
   @override
   String toString() {
-    return 'StartLoading{}';
+    return 'LoadUserAction {user: $user}';
   }
 }
 
-class StopLoading {
+class GetLocaleAction {
+  final Locale locale;
+
+  GetLocaleAction(this.locale);
+
   @override
   String toString() {
-    return 'StopLoading{}';
+    return 'LoadLocaleAction {locale: $locale}';
+  }
+}
+
+class LoadLocaleAction {
+  final Locale locale;
+
+  LoadLocaleAction(this.locale);
+
+  @override
+  String toString() {
+    return 'LoadLocaleAction {locale: $locale}';
+  }
+}
+
+class ChangeLocaleAction {
+  final Locale locale;
+
+  ChangeLocaleAction(this.locale);
+
+  @override
+  String toString() {
+    return 'ChangeLocaleAction {locale: $locale}';
   }
 }

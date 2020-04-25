@@ -14,6 +14,7 @@ class Task {
   String location;
   bool useAlarm;
   String alarmTime;
+  String createdBy;
 
   static final String table = "task";
 
@@ -28,6 +29,7 @@ class Task {
   static final String locationCol = "location";
   static final String useAlarmCol = "useAlarm";
   static final String alarmTimeCol = "alarmTime";
+  static final String createdByCol = "createdBy";
 
   Task(
       {this.id,
@@ -40,7 +42,8 @@ class Task {
       this.useLocation,
       this.location,
       this.useAlarm,
-      this.alarmTime});
+      this.alarmTime,
+      this.createdBy});
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> result = {};
@@ -59,7 +62,7 @@ class Task {
     if (location != null) result[locationCol] = location;
     if (useAlarm != null) result[useAlarmCol] = useAlarm;
     if (alarmTime != null) result[alarmTimeCol] = alarmTime;
-
+    if (createdBy != null) result[createdByCol] = createdBy;
     return result;
   }
 
@@ -76,6 +79,7 @@ class Task {
     this.useLocation = doc[useLocationCol] ?? false;
     this.useAlarm = doc[useAlarmCol] ?? false;
     this.alarmTime = doc[alarmTimeCol];
+    this.createdBy = doc[createdBy];
   }
 
   @override

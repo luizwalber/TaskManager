@@ -12,12 +12,11 @@ class TaskSchemaService implements TaskSchemaRepository {
 
   const TaskSchemaService(this.firestore);
 
-  Future<void> addTaskSchema(TaskSchema taskSchema) {
-    return firestore
-        .collection(path)
-        .reference()
-        .add(taskSchema.toMap())
-        .then((docRef) => taskSchema.id = docRef.documentID);
+  Future<TaskSchema> addTaskSchema(TaskSchema taskSchema) async {
+    final reference =
+        await firestore.collection(path).reference().add(taskSchema.toMap());
+    taskSchema.id = reference.documentID;
+    return taskSchema;
   }
 
   @override

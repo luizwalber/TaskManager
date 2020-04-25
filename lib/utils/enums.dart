@@ -1,5 +1,5 @@
 enum TaskStatus { DONE, PARTIALLY, NOT_DONE, EMPTY }
-enum TaskFrequency { DAILY, WEEKLY, MONTHLY, CUSTOM, EVERY_DAY, ONCE }
+enum TaskFrequency { DAILY, WEEKLY, MONTHLY, CUSTOM, ONCE, ANNUALLY }
 enum ConfirmAction { ACCEPT, CANCEL }
 
 T stringToEnum<T>(Iterable<T> values, String value) {

@@ -1,3 +1,4 @@
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:redux/redux.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/redux/actions/actions.dart';
@@ -13,9 +14,11 @@ void Function(
   return (store, action, next) {
     next(action);
 
-    repository.login().then((_) {
-      store.dispatch(
-          GetTasksNearMonth(DateTime.now().month, DateTime.now().year));
+    EasyLoading.instance..userInteractions = false;
+
+    repository.login().then((loggedUser) {
+      store.dispatch(LoadUserAction(loggedUser));
+      store.dispatch(StartTaskListener());
       store.dispatch(StartSchemaListener());
     });
   };

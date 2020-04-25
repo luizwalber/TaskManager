@@ -4,7 +4,6 @@ import 'package:task_manager/redux/actions/actions.dart';
 
 final taskSchemaReducer = combineReducers<List<TaskSchema>>([
   TypedReducer<List<TaskSchema>, LoadTaskSchemaAction>(_loadTaskSchemas),
-//  TypedReducer<Map<String, List<Task>>, DeleteTaskAction>(_deleteTask),
 ]);
 
 List<TaskSchema> _loadTaskSchemas(

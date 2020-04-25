@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:task_manager/locale/app_localization.dart';
+import 'package:task_manager/model/User.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
 import 'package:task_manager/model/task_schema.dart';
@@ -29,7 +31,7 @@ void addTaskDialog(BuildContext context, DateTime selectedDay, {Task task}) {
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30))),
               child: Text(
-                "Add Task Dialog",
+                AppLocalization.of(context).taskDialog,
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: 18,
@@ -81,9 +83,8 @@ class AddTaskFormState extends State<AddTaskForm> {
     _repeat = false;
     _useLocation = false;
 
-    _currentFrequency = TaskFrequency.DAILY;
+    _currentFrequency = TaskFrequency.ONCE;
     _selectedDays = [false, false, false, false, false, false, false];
-    _frequencyMenuItems = getDropDownMenuItems();
     print(_frequencyMenuItems);
 
     if (widget.task != null) {
@@ -94,6 +95,7 @@ class AddTaskFormState extends State<AddTaskForm> {
 
   @override
   Widget build(BuildContext context) {
+    _frequencyMenuItems = getDropDownMenuItems(context);
     return Form(
         key: _formKey,
         child: Column(
@@ -118,10 +120,10 @@ class AddTaskFormState extends State<AddTaskForm> {
     return Padding(
       padding: edgesBtweenForm,
       child: TextFormField(
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           icon: Icon(Icons.assignment),
-          hintText: 'What is the title of your task?',
-          labelText: 'Title *',
+          hintText: AppLocalization.of(context).taskTitlePlaceholder,
+          labelText: AppLocalization.of(context).taskTitleLabel,
         ),
         validator: _validatorTitle,
         onSaved: _onSavedTitle,
@@ -135,7 +137,7 @@ class AddTaskFormState extends State<AddTaskForm> {
       padding: edgesBtweenForm,
       child: MergeSemantics(
         child: ListTile(
-            title: Text('Repeat'),
+            title: Text(AppLocalization.of(context).repeat),
             trailing:
                 CupertinoSwitch(value: _repeat, onChanged: _onChangedRepeat)),
       ),
@@ -145,16 +147,22 @@ class AddTaskFormState extends State<AddTaskForm> {
   Visibility _frequencyWidget() {
     return Visibility(
       visible: _repeat,
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          Center(child: Text("Frequencia")),
-          Padding(
-              padding: edgesBtweenForm,
-              child: DropdownButton(
-                value: _currentFrequency,
-                items: _frequencyMenuItems,
-                onChanged: _onChangedFrequency,
-              )),
+          Text(AppLocalization.of(context).frequency),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(7.0),
+            ),
+            child: DropdownButton(
+              value: _currentFrequency == TaskFrequency.ONCE
+                  ? TaskFrequency.DAILY
+                  : _currentFrequency,
+              items: _frequencyMenuItems,
+              onChanged: _onChangedFrequency,
+            ),
+          ),
         ],
       ),
     );
@@ -175,7 +183,7 @@ class AddTaskFormState extends State<AddTaskForm> {
       padding: edgesBtweenForm,
       child: MergeSemantics(
         child: ListTile(
-            title: Text('Use Location'),
+            title: Text(AppLocalization.of(context).useLocation),
             trailing: CupertinoSwitch(
                 value: _useLocation, onChanged: _onChangedUseLocation)),
       ),
@@ -189,10 +197,10 @@ class AddTaskFormState extends State<AddTaskForm> {
         keyboardType: TextInputType.multiline,
         controller: controllerDescription,
         maxLines: null,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           icon: Icon(Icons.assignment),
-          hintText: 'What is the description of your task?',
-          labelText: 'Description',
+          hintText: AppLocalization.of(context).taskDescriptionPlaceholder,
+          labelText: AppLocalization.of(context).taskDescriptionLabel,
         ),
         onSaved: _onSavedTitle,
       ),
@@ -207,9 +215,9 @@ class AddTaskFormState extends State<AddTaskForm> {
           builder: (context, state) {
             return RaisedButton(
               color: Colors.blue,
-              onPressed: () => _submit(state.selectedDays),
+              onPressed: () => _submit(state.selectedDays, state.loggedUser),
               child: Text(
-                'Add Task',
+                AppLocalization.of(context).submitTask,
                 style: submitButtonTextStyle,
               ),
             );
@@ -217,12 +225,15 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  List<DropdownMenuItem<TaskFrequency>> getDropDownMenuItems() {
+  List<DropdownMenuItem<TaskFrequency>> getDropDownMenuItems(
+      BuildContext context) {
     List<DropdownMenuItem<TaskFrequency>> items = new List();
 
     TaskFrequency.values.forEach((frequency) {
-      items.add(new DropdownMenuItem(
-          value: frequency, child: new Text(frequency.toString())));
+      if (frequency != TaskFrequency.ONCE)
+        items.add(new DropdownMenuItem(
+            value: frequency, child: new Text(frequency.toString())));
+//                AppLocalization.of(context).translate(frequency.toString()))));
     });
 
     return items;
@@ -246,14 +257,14 @@ class AddTaskFormState extends State<AddTaskForm> {
   }
 
   String _validatorTitle(title) {
-    if (title.isEmpty) return 'Please enter some text';
+    if (title.isEmpty) return AppLocalization.of(context).titleEmpty;
     return null;
   }
 
   void _onChangedRepeat(bool value) {
     setState(() {
       _repeat = value;
-      if (!_repeat) _currentFrequency = TaskFrequency.DAILY;
+      if (!_repeat) _currentFrequency = TaskFrequency.ONCE;
     });
   }
 
@@ -263,30 +274,47 @@ class AddTaskFormState extends State<AddTaskForm> {
     });
   }
 
-  void _submit(List<bool> selectedDays) {
+  void _submit(List<bool> selectedDays, User user) {
     if (_formKey.currentState.validate()) {
-      TaskSchema task = TaskSchema(
+      TaskSchema taskSchema = TaskSchema(
         title: controllerTitle.text,
         createdDay: widget.selectedDay,
         useLocation: _useLocation,
         description: controllerDescription.text,
-        frequency: null,
+        frequency: _currentFrequency,
         selectedDays: null,
+        // TODO see this
         useAlarm: false,
         alarmTime: "",
+        createdBy: user.id,
       );
 
       if (widget.task == null) {
-        task.processedInMonths = {dateMonthHash(widget.selectedDay): true};
+        DateTime current = widget.selectedDay;
+        DateTime next = DateTime(
+          widget.selectedDay.year,
+          widget.selectedDay.month + 1,
+        );
+        DateTime previously = DateTime(
+          widget.selectedDay.year,
+          widget.selectedDay.month - 1,
+        );
 
-        StoreProvider.of<AppState>(context).dispatch(AddTaskSchemaAction(task));
-      } else {
-        task.id = widget.task.id;
-        task.alarmTime = widget.task.alarmTime;
-        task.location = widget.task.location;
-//        task.createdDay = widget.task.createdDay TODO think about a better solution
+        taskSchema.processedInMonths = {
+          dateMonthHash(current): true,
+          dateMonthHash(next): true,
+          dateMonthHash(previously): true
+        };
+
         StoreProvider.of<AppState>(context)
-            .dispatch(UpdateTaskSchemaAction(task));
+            .dispatch(AddTaskSchemaAction(taskSchema));
+      } else {
+//        taskSchema.id = widget.task.id;
+//        taskSchema.alarmTime = widget.task.alarmTime;
+//        taskSchema.location = widget.task.location;
+////        task.createdDay = widget.task.createdDay TODO think about a better solution
+//        StoreProvider.of<AppState>(context)
+//            .dispatch(UpdateTaskSchemaAction(taskSchema));
       }
       Navigator.of(context).pop();
     }
