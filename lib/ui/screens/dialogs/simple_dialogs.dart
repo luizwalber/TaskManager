@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:i18n_extension/default.i18n.dart';
+import 'package:task_manager/main.i18n.dart';
 import 'package:task_manager/utils/enums.dart';
 
 Future<ConfirmAction> confirmDialog(

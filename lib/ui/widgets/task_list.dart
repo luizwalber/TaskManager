@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:i18n_extension/default.i18n.dart';
+import 'package:task_manager/main.i18n.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
 import 'package:task_manager/redux/actions/actions.dart';
