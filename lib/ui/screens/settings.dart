@@ -1,9 +1,13 @@
+import 'package:async_redux/async_redux.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:i18n_extension/i18n_widget.dart';
+import 'package:task_manager/main.dart';
 import 'package:task_manager/main.i18n.dart';
 import 'package:task_manager/model/app_state.dart';
+import 'package:task_manager/model/user_preferences.dart';
+import 'package:task_manager/redux/actions/save_user_preferences_action.dart';
+import 'package:task_manager/redux/view_model/user_preferences_view_model.dart';
 
 class Settings extends StatefulWidget {
   Settings({Key key}) : super(key: key);
@@ -32,7 +36,7 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget _options(BuildContext context) {
-    return Column(children: <Widget>[
+    return Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
       LocaleOptions(context),
       Divider(
         height: 50,
@@ -44,40 +48,45 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget LocaleOptions(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Text("Current language:".i18n),
-            StoreConnector<AppState, AppState>(
-                converter: (store) => store.state,
-                builder: (context, state) {
-                  return Text(state.preferredLocale.toString());
-                })
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            RaisedButton(
-              child: Text("Portuguese".i18n),
-              onPressed: () => changeLanguage(context, Locale('pt', 'BR')),
-            ),
-            RaisedButton(
-              child: Text("English".i18n),
-              onPressed: () => changeLanguage(context, Locale('en', 'US')),
-            ),
-          ],
-        )
-      ],
-    );
+    return StoreConnector<AppState, UserPreferencesViewModel>(
+        model: UserPreferencesViewModel(),
+        builder: (context, vm) {
+          return Column(mainAxisSize: MainAxisSize.max,
+//      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text("Current language:".i18n + "${I18n.localeStr}".i18n),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    RaisedButton(
+                      child: Text("Portuguese".i18n),
+                      onPressed: () => changeLanguage(
+                        context,
+                        Locale('pt', 'BR'),
+                        vm.userPreferences,
+                      ),
+                    ),
+                    RaisedButton(
+                      child: Text("English".i18n),
+                      onPressed: () => changeLanguage(
+                        context,
+                        Locale('en', 'US'),
+                        vm.userPreferences,
+                      ),
+                    ),
+                  ],
+                )
+              ]);
+        });
   }
 
-  changeLanguage(BuildContext context, Locale locale) {
+  void changeLanguage(
+      BuildContext context, Locale locale, UserPreferences userPreferences) {
     print(locale.languageCode);
     I18n.of(context).locale = locale;
-//    StoreProvider.of<AppState>(context)
-//        .dispatch(ChangeLocaleAction(Locale(language)));
+    store.dispatch(SaveUserPreferencesAction(
+      userPreferences: userPreferences.copyWith(language: locale),
+    ));
   }
 
   Widget numberOfTasksOption() {
@@ -85,7 +94,7 @@ class _SettingsState extends State<Settings> {
   }
 
   Widget colorOptions() {
-    return Text('ttt');
+    return Text('asdfasdf');
   }
 
   AppBar _appBar() {

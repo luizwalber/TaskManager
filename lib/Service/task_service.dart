@@ -5,25 +5,29 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:task_manager/Service/task_schema_service.dart';
+import 'package:task_manager/main.dart';
 import 'package:task_manager/model/task.dart';
 import 'package:task_manager/model/task_schema.dart';
-import 'package:task_manager/repository/task_repository.dart';
-import 'package:task_manager/repository/task_schema_repository.dart';
+import 'package:task_manager/redux/actions/load_monthly_tasks_action.dart';
 import 'package:task_manager/utils/date_utils.dart';
 import 'package:task_manager/utils/enums.dart';
 
-class TaskService implements TaskRepository {
+/// Service to isolate the actions for the task
+class TaskService {
   static const String path = 'task';
 
-  final Firestore firestore;
+  final Firestore firestore = Firestore.instance;
 
-  const TaskService(this.firestore);
+  TaskService._();
 
-  static TaskSchemaRepository taskSchemaRepository =
-      TaskSchemaService(Firestore.instance);
+  static TaskService _instance;
 
-  @override
+  static TaskService get instance {
+    return _instance ??= TaskService._();
+  }
+
   Future<Task> addTask(Task task) async {
     final reference =
         await firestore.collection(path).reference().add(task.toMap());
@@ -31,12 +35,14 @@ class TaskService implements TaskRepository {
     return task;
   }
 
-  @override
-  Future<void> updateTask(Task task) {
-    return firestore.collection(path).document(task.id).setData(task.toMap());
+  Future<void> updateTask(Task task) async {
+    final reference = await firestore
+        .collection(path)
+        .document(task.id)
+        .setData(task.toMap());
+    return reference;
   }
 
-  @override
   Future<void> deleteTask(String schemaId) async {
     var futures = <Future>[];
 
@@ -47,11 +53,12 @@ class TaskService implements TaskRepository {
         .then((value) => value.documents.forEach((element) {
               futures.add(element.reference.delete());
             }));
-    taskSchemaRepository.deleteTaskSchema(schemaId);
-    return Future.wait(futures);
+    futures.add(TaskSchemaService.instance.deleteTaskSchema(schemaId));
+    Future<void> resolve = Future.wait(futures);
+//    resolve.then((value) => EasyLoading.dismiss());
+    return resolve;
   }
 
-  @override
   Stream<List<Task>> getTasks(String userId) {
     // get the tasks since 7 days before the start of the month and 7 days after
 //    DateTime start = new DateTime(2020, 03, 01).subtract(Duration(days: 7));
@@ -70,11 +77,22 @@ class TaskService implements TaskRepository {
     }); // bad code, I know, TODO think latter
   }
 
-  @override
-  Future<void> processTasksFromSchema(TaskSchema taskSchema) {
+  Future<List<TaskSchema>> processTasksFromSchemaList(
+      List<TaskSchema> taskSchemas) async {
     var futures = <Future>[];
-    for (var monthHash in taskSchema.processedInMonths.keys) {
-      if (taskSchema.processedInMonths[monthHash]) {
+
+    taskSchemas.forEach((schema) {
+      futures.add(TaskService.instance._processSchema(schema));
+    });
+
+    await Future.wait(futures);
+    return taskSchemas;
+  }
+
+  Future<void> _processSchema(TaskSchema taskSchema) {
+    var futures = <Future>[];
+    for (var monthHash in taskSchema.processInMonths.keys) {
+      if (taskSchema.processInMonths[monthHash]) {
         int year = int.parse(monthHash.split("-")[0]);
         int initialMonth = int.parse(monthHash.split("-")[1]);
 
@@ -95,11 +113,12 @@ class TaskService implements TaskRepository {
           }
           date = date.add(Duration(days: 1));
           currentMonth = date.month;
-          taskSchema.processedInMonths[monthHash] = false;
+          taskSchema.processInMonths[monthHash] = false;
         } while (currentMonth == initialMonth);
       }
     }
-    futures.add(taskSchemaRepository.updateTaskSchema(taskSchema));
+    // TODO sometimes here I'm updating a schema that doesn't exist (the first) fix latter
+    futures.add(TaskSchemaService.instance.updateTaskSchema(taskSchema));
     return Future.wait(futures);
   }
 
@@ -130,5 +149,30 @@ class TaskService implements TaskRepository {
             currentDate.month == createdDate.month;
     }
     return false;
+  }
+
+  Map<String, List<Task>> groupTasksByMonth(List<Task> tasks) {
+    return groupBy(tasks, (task) => dateDayHash(task.day));
+  }
+
+  void startTaskListener(String userId) {
+    getTasks(userId).listen((tasks) {
+      store.dispatch(LoadMonthlyTasksAction(tasks: tasks));
+    }).onError((error) {
+      print("\n\nhere\n\n");
+    });
+  }
+
+  void changeMonth(int year, int month, List<TaskSchema> taskSchemas) {
+    for (TaskSchema currentSchema in taskSchemas) {
+      String currentMonthHash = dateMonthHash(new DateTime(year, month));
+      String nextMonthHash = dateMonthHash(new DateTime(year, month + 1));
+      String previousMonthHash = dateMonthHash(new DateTime(year, month - 1));
+
+      currentSchema.processInMonths.putIfAbsent(currentMonthHash, () => true);
+      currentSchema.processInMonths.putIfAbsent(nextMonthHash, () => true);
+      currentSchema.processInMonths.putIfAbsent(previousMonthHash, () => true);
+      TaskSchemaService.instance.updateTaskSchema(currentSchema);
+    }
   }
 }

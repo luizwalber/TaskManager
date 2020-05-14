@@ -14,7 +14,7 @@ class TaskSchema {
   bool useAlarm;
   String alarmTime;
   String alarmRingtone;
-  Map<String, bool> processedInMonths;
+  Map<String, bool> processInMonths;
   String createdBy;
 
   static final String table = "task_schema";
@@ -45,7 +45,7 @@ class TaskSchema {
       this.useAlarm,
       this.alarmRingtone,
       this.alarmTime,
-      this.processedInMonths,
+      this.processInMonths,
       this.createdBy});
 
   Map<String, dynamic> toMap() {
@@ -64,8 +64,7 @@ class TaskSchema {
     if (useAlarm != null) result[useAlarmCol] = useAlarm;
     if (alarmTime != null) result[alarmTimeCol] = alarmTime;
     if (alarmRingtone != null) result[alarmRingtoneCol] = alarmRingtone;
-    if (processedInMonths != null)
-      result[processedInMonthsCol] = processedInMonths;
+    if (processInMonths != null) result[processedInMonthsCol] = processInMonths;
     if (selectedDays != null && selectedDays.length == 7)
       result[selectedDaysCol] = selectedDays;
     if (createdBy != null) result[createdByCol] = createdBy;
@@ -85,7 +84,7 @@ class TaskSchema {
     this.useAlarm = doc[useAlarmCol] ?? false;
     this.alarmRingtone = doc[alarmRingtoneCol];
     this.alarmTime = doc[alarmTimeCol];
-    this.processedInMonths = Map.from(doc[processedInMonthsCol]);
+    this.processInMonths = Map.from(doc[processedInMonthsCol]);
     this.selectedDays = doc[selectedDaysCol];
     this.createdBy = doc[createdByCol];
   }

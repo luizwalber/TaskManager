@@ -1,11 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:task_manager/model/User.dart';
-import 'package:task_manager/repository/user_repository.dart';
 
-class UserService implements UserRepository {
-  final FirebaseAuth auth;
+/// Service to isolate the actions for the User
+class UserService {
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
-  const UserService(this.auth);
+  final Firestore firestore = Firestore.instance;
+
+  UserService._();
+
+  static UserService _instance;
+
+  static UserService get instance {
+    return _instance ??= UserService._();
+  }
 
   @override
   Future<User> login() async {

@@ -1,33 +1,38 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:task_manager/model/User.dart';
 import 'package:task_manager/model/task.dart';
 import 'package:task_manager/model/task_schema.dart';
+import 'package:task_manager/model/user_preferences.dart';
 
 @immutable
 class AppState {
   final Map<String, List<Task>> monthlyTasks;
-  final List<bool> selectedDays;
   final List<TaskSchema> taskSchemas;
-  final User loggedUser;
-  final Locale preferredLocale;
+  final User user;
+  final bool loading;
+  final UserPreferences userPreferences;
+  final DateTime selectedDay;
 
-  AppState({
-    @required this.monthlyTasks,
-    @required this.selectedDays,
-    @required this.taskSchemas,
-    @required this.loggedUser,
-    @required this.preferredLocale,
-  });
+  final List<bool> selectedDays;
+
+  AppState(
+      {@required this.monthlyTasks,
+      @required this.selectedDays,
+      @required this.taskSchemas,
+      @required this.user,
+      @required this.loading,
+      @required this.userPreferences,
+      @required this.selectedDay});
 
   factory AppState.initial() {
     return AppState(
       monthlyTasks: {},
       selectedDays: [false, false, false, false, false, false, false],
       taskSchemas: [],
-      loggedUser: null,
-      preferredLocale: Locale("pt"),
+      user: null,
+      loading: true,
+      userPreferences: UserPreferences.initial(),
+      selectedDay: DateTime.now(),
     );
   }
 
@@ -37,14 +42,18 @@ class AppState {
     List<bool> selectedDays,
     List<TaskSchema> taskSchemas,
     User loggedUser,
-    Locale preferredLocale,
+    bool loading,
+    UserPreferences userPreferences,
+    DateTime selectedDay,
   }) {
     return AppState(
       monthlyTasks: monthlyTasks ?? this.monthlyTasks,
       selectedDays: selectedDays ?? this.selectedDays,
       taskSchemas: taskSchemas ?? this.taskSchemas,
-      loggedUser: loggedUser ?? this.loggedUser,
-      preferredLocale: preferredLocale ?? this.preferredLocale,
+      user: loggedUser ?? this.user,
+      loading: loading ?? this.loading,
+      userPreferences: userPreferences ?? this.userPreferences,
+      selectedDay: selectedDay ?? this.selectedDay,
     );
   }
 
@@ -52,10 +61,11 @@ class AppState {
   int get hashCode =>
       monthlyTasks.hashCode ^
       selectedDays.hashCode ^
-      loggedUser.hashCode ^
+      user.hashCode ^
       taskSchemas.hashCode ^
-      loggedUser.hashCode ^
-      preferredLocale.hashCode;
+      loading.hashCode ^
+      userPreferences.hashCode ^
+      selectedDay.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -65,13 +75,21 @@ class AppState {
           monthlyTasks == other.monthlyTasks &&
           selectedDays == other.selectedDays &&
           taskSchemas == other.taskSchemas &&
-          loggedUser == other.loggedUser &&
-          preferredLocale == other.preferredLocale;
+          user == other.user &&
+          loading == other.loading &&
+          userPreferences == other.userPreferences &&
+          selectedDay == other.selectedDay;
 
   @override
   String toString() {
-    return 'AppState{monthlyTasks: $monthlyTasks, selectedDays: $selectedDays, '
-        'taskSchemas: $taskSchemas, LoggedUser: $loggedUser, '
-        'preferedLocale: $preferredLocale}';
+    return '''AppState{ 
+    monthlyTasks: $monthlyTasks, 
+    selectedDays: $selectedDays, 
+    taskSchemas: $taskSchemas, 
+    LoggedUser: $user, 
+    loading: $loading,
+    UserPreferences: $userPreferences,
+    selectedDay: $selectedDay
+    }''';
   }
 }

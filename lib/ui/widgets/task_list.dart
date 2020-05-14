@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:task_manager/Service/task_service.dart';
 import 'package:task_manager/main.i18n.dart';
-import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
-import 'package:task_manager/redux/actions/actions.dart';
-import 'package:task_manager/ui/screens/dialogs/add_task_dialog.dart';
-import 'package:task_manager/ui/screens/dialogs/simple_dialogs.dart';
+import 'package:task_manager/ui/dialogs/add_task_dialog.dart';
+import 'package:task_manager/ui/dialogs/simple_dialogs.dart';
 import 'package:task_manager/utils/enums.dart';
 
 /// TODO bugs - add tasks with no task (HUGE) // titles with more than 1 line in title will break the layout
@@ -177,8 +175,7 @@ class _TaskListState extends State<TaskList> {
       "Are you sure you want to delete the task ".i18n + "${task.title}?",
     );
     if (confirmation == ConfirmAction.ACCEPT) {
-      StoreProvider.of<AppState>(context)
-          .dispatch(DeleteTaskAction(task.schemaId));
+      TaskService.instance.deleteTask(task.schemaId);
     }
   }
 
@@ -236,6 +233,6 @@ class _TaskListState extends State<TaskList> {
     });
     task.status = taskStatus;
 
-    StoreProvider.of<AppState>(context).dispatch(UpdateTaskAction(task));
+    TaskService.instance.updateTask(task);
   }
 }

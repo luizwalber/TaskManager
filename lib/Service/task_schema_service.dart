@@ -1,43 +1,61 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:task_manager/Service/task_service.dart';
+import 'package:task_manager/main.dart';
 import 'package:task_manager/model/task_schema.dart';
-import 'package:task_manager/repository/task_repository.dart';
-import 'package:task_manager/repository/task_schema_repository.dart';
+import 'package:task_manager/redux/actions/load_task_schemas_action.dart';
 
-class TaskSchemaService implements TaskSchemaRepository {
+/// Service to isolate the actions for the Task Schema
+class TaskSchemaService {
   static const String path = 'task_schema';
-  static TaskRepository taskRepository = TaskService(Firestore.instance);
 
-  final Firestore firestore;
+  final Firestore firestore = Firestore.instance;
 
-  const TaskSchemaService(this.firestore);
+  TaskSchemaService._();
+
+  static TaskSchemaService _instance;
+
+  static TaskSchemaService get instance {
+    return _instance ??= TaskSchemaService._();
+  }
 
   Future<TaskSchema> addTaskSchema(TaskSchema taskSchema) async {
-    final reference =
-        await firestore.collection(path).reference().add(taskSchema.toMap());
-    taskSchema.id = reference.documentID;
+    try {
+      final reference =
+          await firestore.collection(path).reference().add(taskSchema.toMap());
+
+      taskSchema.id = reference.documentID;
+    } catch (e) {
+      print(e.toString());
+    }
     return taskSchema;
   }
 
-  @override
-  Future<void> updateTaskSchema(TaskSchema taskSchema) {
-    return firestore
+  Future<void> updateTaskSchema(TaskSchema taskSchema) async {
+    final reference = await firestore
         .collection(path)
         .document(taskSchema.id)
         .setData(taskSchema.toMap());
+
+    return reference;
   }
 
-  @override
-  Future<void> deleteTaskSchema(String id) {
-    return firestore.collection(path).document(id).delete();
+  Future<void> deleteTaskSchema(String id) async {
+    final reference = await firestore.collection(path).document(id).delete();
+    return reference;
   }
 
-  @override
   Stream<List<TaskSchema>> getAllTaskSchema() {
-    return firestore.collection(path).snapshots().map((snapshot) {
+    final result = firestore.collection(path).snapshots().map((snapshot) {
       return snapshot.documents.map((doc) {
         return TaskSchema.fromFirestore(doc);
       }).toList();
+    });
+
+    return result;
+  }
+
+  void startTaskSchemaListener(String userId) {
+    getAllTaskSchema().listen((taskSchemas) {
+      store.dispatch(LoadTaskSchemaAction(taskSchemas: taskSchemas));
     });
   }
 }

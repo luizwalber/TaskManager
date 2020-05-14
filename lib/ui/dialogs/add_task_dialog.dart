@@ -1,12 +1,13 @@
+import 'package:async_redux/async_redux.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:task_manager/Service/task_schema_service.dart';
 import 'package:task_manager/main.i18n.dart';
 import 'package:task_manager/model/User.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
 import 'package:task_manager/model/task_schema.dart';
-import 'package:task_manager/redux/actions/actions.dart';
+import 'package:task_manager/redux/view_model/submit_view_model.dart';
 import 'package:task_manager/ui/widgets/weekday_selector.dart';
 import 'package:task_manager/utils/date_utils.dart';
 import 'package:task_manager/utils/enums.dart';
@@ -209,20 +210,19 @@ class AddTaskFormState extends State<AddTaskForm> {
 
   Align _submitWidget() {
     return Align(
-      alignment: FractionalOffset.bottomCenter,
-      child: StoreConnector<AppState, AppState>(
-          converter: (store) => store.state,
-          builder: (context, state) {
-            return RaisedButton(
-              color: Colors.blue,
-              onPressed: () => _submit(state.selectedDays, state.loggedUser),
-              child: Text(
-                "Add Task".i18n,
-                style: submitButtonTextStyle,
-              ),
-            );
-          }),
-    );
+        alignment: FractionalOffset.bottomCenter,
+        child: StoreConnector<AppState, SubmitSchemaViewModel>(
+            model: SubmitSchemaViewModel(),
+            builder: (context, SubmitSchemaViewModel vm) {
+              return RaisedButton(
+                color: Colors.blue,
+                onPressed: () => _submit(vm.selectedDays, vm.user),
+                child: Text(
+                  "Add Task".i18n,
+                  style: submitButtonTextStyle,
+                ),
+              );
+            }));
   }
 
   List<DropdownMenuItem<TaskFrequency>> getDropDownMenuItems(
@@ -286,7 +286,7 @@ class AddTaskFormState extends State<AddTaskForm> {
         // TODO see this
         useAlarm: false,
         alarmTime: "",
-        createdBy: user.id,
+        createdBy: user?.id, // TODO BUG the state is returning null for user
       );
 
       if (widget.task == null) {
@@ -300,14 +300,14 @@ class AddTaskFormState extends State<AddTaskForm> {
           widget.selectedDay.month - 1,
         );
 
-        taskSchema.processedInMonths = {
+        taskSchema.processInMonths = {
           dateMonthHash(current): true,
           dateMonthHash(next): true,
           dateMonthHash(previously): true
         };
 
-        StoreProvider.of<AppState>(context)
-            .dispatch(AddTaskSchemaAction(taskSchema));
+        TaskSchemaService.instance
+            .addTaskSchema(taskSchema); //TODO then msg to usr
       } else {
 //        taskSchema.id = widget.task.id;
 //        taskSchema.alarmTime = widget.task.alarmTime;

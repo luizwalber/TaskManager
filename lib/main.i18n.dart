@@ -1,5 +1,6 @@
 import 'package:i18n_extension/i18n_extension.dart';
 
+/// extension for the String class to include the function "".i18n to translate the string
 extension Localization on String {
   static var _t = Translations("en_us") +
       {
