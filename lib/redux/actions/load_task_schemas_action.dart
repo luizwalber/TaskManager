@@ -12,14 +12,6 @@ class LoadTaskSchemaAction extends ReduxAction<AppState> {
   LoadTaskSchemaAction({@required this.taskSchemas})
       : assert(taskSchemas != null);
 
-  void before() {
-    EasyLoading.show();
-  }
-
-  void after() {
-    EasyLoading.dismiss();
-  }
-
   @override
   Future<AppState> reduce() async {
     return state.copyWith(

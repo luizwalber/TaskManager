@@ -9,15 +9,7 @@ class ChangeSelectedDayAction extends ReduxAction<AppState> {
 
   ChangeSelectedDayAction({@required this.selectedDay})
       : assert(selectedDay != null);
-
-  void before() {
-    EasyLoading.show();
-  }
-
-  void after() {
-    EasyLoading.dismiss();
-  }
-
+      
   @override
   AppState reduce() {
     return state.copyWith(

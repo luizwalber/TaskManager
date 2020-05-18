@@ -10,14 +10,6 @@ class LoadUserAction extends ReduxAction<AppState> {
 
   LoadUserAction({@required this.loggedUser}) : assert(loggedUser != null);
 
-  void before() {
-    EasyLoading.show();
-  }
-
-  void after() {
-    EasyLoading.dismiss();
-  }
-
   @override
   AppState reduce() {
     return state.copyWith(

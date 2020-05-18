@@ -11,14 +11,6 @@ class LoadMonthlyTasksAction extends ReduxAction<AppState> {
 
   LoadMonthlyTasksAction({@required this.tasks}) : assert(tasks != null);
 
-  void before() {
-    EasyLoading.show();
-  }
-
-  void after() {
-    EasyLoading.dismiss();
-  }
-
   @override
   AppState reduce() {
     return state.copyWith(

@@ -13,23 +13,10 @@ class UserPreferencesViewModel extends BaseModel<AppState> {
 
   UserPreferencesViewModel.build({
     @required this.userPreferences,
-  });
+  }) : super(equals:[userPreferences]);
 
   @override
   UserPreferencesViewModel fromStore() => UserPreferencesViewModel.build(
         userPreferences: state.userPreferences,
       );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == other &&
-          other is UserPreferencesViewModel &&
-          runtimeType == other.runtimeType &&
-          userPreferences == other.userPreferences &&
-          selectedDays == other.selectedDays;
-
-  @override
-  int get hashCode =>
-      super.hashCode ^ userPreferences.hashCode ^ selectedDays.hashCode;
 }

@@ -22,17 +22,4 @@ class TaskListViewModel extends BaseModel<AppState> {
       selectedDay: state.selectedDay,
     );
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == other &&
-          other is TaskListViewModel &&
-          runtimeType == other.runtimeType &&
-          monthlyTasks == other.monthlyTasks &&
-          selectedDay == other.selectedDay;
-
-  @override
-  int get hashCode =>
-      super.hashCode ^ monthlyTasks.hashCode ^ selectedDay.hashCode;
 }

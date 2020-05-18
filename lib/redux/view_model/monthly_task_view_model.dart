@@ -23,17 +23,4 @@ class CalendarViewModel extends BaseModel<AppState> {
       taskSchemas: state.taskSchemas,
     );
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == other &&
-          other is CalendarViewModel &&
-          runtimeType == other.runtimeType &&
-          monthlyTasks == other.monthlyTasks &&
-          taskSchemas == other.taskSchemas;
-
-  @override
-  int get hashCode =>
-      super.hashCode ^ monthlyTasks.hashCode ^ taskSchemas.hashCode;
 }

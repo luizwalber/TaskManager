@@ -8,12 +8,7 @@ class InitAppAction extends ReduxAction<AppState> {
   final BuildContext context;
 
   InitAppAction({@required this.context}) : assert(context != null);
-
-  // TODO loading screen
-  void before() {}
-
-  void after() {}
-
+  
   @override
   Future<AppState> reduce() async {
     return state.copyWith(
