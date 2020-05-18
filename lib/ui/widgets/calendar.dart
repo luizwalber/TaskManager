@@ -1,18 +1,21 @@
 // More advanced TableCalendar configuration (using Builders & Styles)
-import 'package:async_redux/async_redux.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:task_manager/Service/task_service.dart';
 import 'package:task_manager/main.dart';
-import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/model/task.dart';
+import 'package:task_manager/model/task_schema.dart';
 import 'package:task_manager/redux/actions/change_selected_day_action.dart';
-import 'package:task_manager/redux/view_model/monthly_task_view_model.dart';
 import 'package:task_manager/utils/enums.dart';
 
 class Calendar extends StatefulWidget {
+  final Map<String, List<Task>> monthlyTasks;
+  final List<TaskSchema> taskSchemas;
+
+  Calendar({Key key, this.monthlyTasks, this.taskSchemas}) : super(key: key);
+
   @override
   _CalendarState createState() => _CalendarState();
 }
@@ -40,32 +43,23 @@ class _CalendarState extends State<Calendar> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, MonthlyTaskViewModel>(
-      model: MonthlyTaskViewModel(),
-      builder: (context, vm) {
-        return TableCalendar(
-          rowHeight: 50,
-          //TODO bug, is overflowing when the month has more than 4 weeks
-          locale: I18n.localeStr,
-          calendarController: _calendarController,
-          events: extractEvents(vm.monthlyTasks),
-          calendarStyle: _calendarStyle(),
-          headerStyle: _calendarHeaderStyle(),
-          builders: calendarBuilders(),
-          onDaySelected: _onDaySelected,
-          onVisibleDaysChanged: _onMonthChange,
-        );
-      },
+    return TableCalendar(
+      rowHeight: 50,
+      //TODO bug, is overflowing when the month has more than 4 weeks
+      locale: I18n.localeStr,
+      calendarController: _calendarController,
+      events: extractEvents(),
+      calendarStyle: _calendarStyle(),
+      headerStyle: _calendarHeaderStyle(),
+      builders: calendarBuilders(),
+      onDaySelected: _onDaySelected,
+      onVisibleDaysChanged: _onMonthChange,
     );
   }
 
   void _onMonthChange(DateTime first, DateTime last, CalendarFormat format) {
-    StoreConnector<AppState, MonthlyTaskViewModel>(
-        model: MonthlyTaskViewModel(),
-        builder: (context, vm) {
-          TaskService.instance //TODO
-              .changeMonth(first.year, first.month, vm.taskSchemas);
-        });
+    TaskService.instance //TODO
+        .changeMonth(first.year, first.month, widget.taskSchemas);
   }
 
   CalendarBuilders calendarBuilders() {
@@ -161,11 +155,10 @@ class _CalendarState extends State<Calendar> with TickerProviderStateMixin {
         weekendStyle: TextStyle().copyWith(color: Colors.pinkAccent));
   }
 
-  Map<DateTime, List<Task>> extractEvents(
-      Map<String, List<Task>> monthlyTasks) {
+  Map<DateTime, List<Task>> extractEvents() {
     Map<DateTime, List<Task>> events = {};
 
-    monthlyTasks?.forEach((dayHash, tasks) {
+    widget.monthlyTasks?.forEach((dayHash, tasks) {
       final DateTime date = DateTime.parse(dayHash);
       events[date] = tasks;
     });

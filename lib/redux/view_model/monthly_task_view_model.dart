@@ -5,20 +5,20 @@ import 'package:task_manager/model/task.dart';
 import 'package:task_manager/model/task_schema.dart';
 
 /// Helper to holds part of the state info
-class MonthlyTaskViewModel extends BaseModel<AppState> {
+class CalendarViewModel extends BaseModel<AppState> {
   Map<String, List<Task>> monthlyTasks;
   List<TaskSchema> taskSchemas;
 
-  MonthlyTaskViewModel();
+  CalendarViewModel();
 
-  MonthlyTaskViewModel.build({
+  CalendarViewModel.build({
     @required this.monthlyTasks,
     @required this.taskSchemas,
   }) : super(equals: [monthlyTasks, taskSchemas]);
 
   @override
-  MonthlyTaskViewModel fromStore() {
-    return MonthlyTaskViewModel.build(
+  CalendarViewModel fromStore() {
+    return CalendarViewModel.build(
       monthlyTasks: state.monthlyTasks,
       taskSchemas: state.taskSchemas,
     );
@@ -28,7 +28,7 @@ class MonthlyTaskViewModel extends BaseModel<AppState> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       super == other &&
-          other is MonthlyTaskViewModel &&
+          other is CalendarViewModel &&
           runtimeType == other.runtimeType &&
           monthlyTasks == other.monthlyTasks &&
           taskSchemas == other.taskSchemas;

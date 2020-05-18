@@ -5,6 +5,7 @@ import 'package:task_manager/main.dart';
 import 'package:task_manager/main.i18n.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/redux/actions/init_app_action.dart';
+import 'package:task_manager/redux/view_model/monthly_task_view_model.dart';
 import 'package:task_manager/redux/view_model/task_list_view_model.dart';
 import 'package:task_manager/ui/widgets/calendar.dart';
 import 'package:task_manager/ui/widgets/task_list.dart';
@@ -32,12 +33,23 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          Calendar(),
+          buildCalendar(),
           Divider(height: 30, thickness: 3, color: Colors.black12),
           _taskList(context)
         ],
       ),
     );
+  }
+
+  Widget buildCalendar() {
+    return StoreConnector<AppState, CalendarViewModel>(
+        model: CalendarViewModel(),
+        builder: (context, vm) {
+          return Calendar(
+            monthlyTasks: vm.monthlyTasks,
+            taskSchemas: vm.taskSchemas,
+          );
+        });
   }
 
   Widget _taskList(BuildContext context) {

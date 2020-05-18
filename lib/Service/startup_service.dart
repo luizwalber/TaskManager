@@ -31,7 +31,7 @@ class StartupService {
     store.dispatch(LoadUserAction(loggedUser: user));
     TaskService.instance.startTaskListener(user.id);
     TaskSchemaService.instance.startTaskSchemaListener(user.id);
-    store.dispatch(LoadUserPreferencesAction(context: context));
+    //store.dispatch(LoadUserPreferencesAction(context: context));
 
     return true;
   }
