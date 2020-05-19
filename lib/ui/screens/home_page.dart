@@ -5,7 +5,7 @@ import 'package:task_manager/main.dart';
 import 'package:task_manager/main.i18n.dart';
 import 'package:task_manager/model/app_state.dart';
 import 'package:task_manager/redux/actions/init_app_action.dart';
-import 'package:task_manager/redux/view_model/monthly_task_view_model.dart';
+import 'package:task_manager/redux/view_model/calendar_view_model.dart';
 import 'package:task_manager/redux/view_model/task_list_view_model.dart';
 import 'package:task_manager/ui/widgets/calendar.dart';
 import 'package:task_manager/ui/widgets/task_list.dart';

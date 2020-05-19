@@ -9,6 +9,8 @@ class CalendarViewModel extends BaseModel<AppState> {
   Map<String, List<Task>> monthlyTasks;
   List<TaskSchema> taskSchemas;
 
+
+
   CalendarViewModel();
 
   CalendarViewModel.build({

@@ -30,7 +30,7 @@ class TaskSchema {
   static final String useAlarmCol = "useAlarm";
   static final String alarmTimeCol = "alarmTime";
   static final String alarmRingtoneCol = "alarmRingtone";
-  static final String processedInMonthsCol = "processedInMonths";
+  static final String processInMonthsCol = "processInMonths";
   static final String createdByCol = "createdBy";
 
   TaskSchema(
@@ -64,7 +64,7 @@ class TaskSchema {
     if (useAlarm != null) result[useAlarmCol] = useAlarm;
     if (alarmTime != null) result[alarmTimeCol] = alarmTime;
     if (alarmRingtone != null) result[alarmRingtoneCol] = alarmRingtone;
-    if (processInMonths != null) result[processedInMonthsCol] = processInMonths;
+    if (processInMonths != null) result[processInMonthsCol] = processInMonths;
     if (selectedDays != null && selectedDays.length == 7)
       result[selectedDaysCol] = selectedDays;
     if (createdBy != null) result[createdByCol] = createdBy;
@@ -84,7 +84,7 @@ class TaskSchema {
     this.useAlarm = doc[useAlarmCol] ?? false;
     this.alarmRingtone = doc[alarmRingtoneCol];
     this.alarmTime = doc[alarmTimeCol];
-    this.processInMonths = Map.from(doc[processedInMonthsCol]);
+    this.processInMonths = Map.from(doc[processInMonthsCol]);
     this.selectedDays = doc[selectedDaysCol];
     this.createdBy = doc[createdByCol];
   }
