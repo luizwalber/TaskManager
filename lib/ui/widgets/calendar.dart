@@ -4,17 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:task_manager/Service/task_service.dart';
-import 'package:task_manager/main.dart';
 import 'package:task_manager/model/task.dart';
 import 'package:task_manager/model/task_schema.dart';
-import 'package:task_manager/redux/actions/change_selected_day_action.dart';
 import 'package:task_manager/utils/enums.dart';
 
 class Calendar extends StatefulWidget {
   final Map<String, List<Task>> monthlyTasks;
   final List<TaskSchema> taskSchemas;
 
-  Calendar({Key key, this.monthlyTasks, this.taskSchemas}) : super(key: key);
+  final void Function(DateTime) changeSelectedDay;
+
+  Calendar(
+      {Key key, this.monthlyTasks, this.taskSchemas, this.changeSelectedDay})
+      : super(key: key);
 
   @override
   _CalendarState createState() => _CalendarState();
@@ -32,6 +34,7 @@ class _CalendarState extends State<Calendar> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 200),
     );
     _animationController.forward();
+    super.initState();
   }
 
   @override
@@ -44,15 +47,14 @@ class _CalendarState extends State<Calendar> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return TableCalendar(
-      rowHeight: 50,
-      //TODO bug, is overflowing when the month has more than 4 weeks
+      rowHeight: 40,
+      //TODO bug, is overflowing when the month has more than 4 weeks DIFERENT RESOLUTIONS DIFERENT ROW HEIGHTS
       locale: I18n.localeStr,
       calendarController: _calendarController,
       events: extractEvents(),
       calendarStyle: _calendarStyle(),
       headerStyle: _calendarHeaderStyle(),
       builders: calendarBuilders(),
-      onDaySelected: _onDaySelected,
       onVisibleDaysChanged: _onMonthChange,
     );
   }
@@ -122,6 +124,8 @@ class _CalendarState extends State<Calendar> with TickerProviderStateMixin {
   }
 
   Widget _onSelectDay(context, date, _) {
+    widget.changeSelectedDay(date);
+
     return FadeTransition(
         opacity: Tween(begin: 0.0, end: 1.0).animate(_animationController),
         child: Center(
@@ -189,12 +193,6 @@ class _CalendarState extends State<Calendar> with TickerProviderStateMixin {
     return children;
   }
 
-  void _onDaySelected(DateTime day, List tasks) {
-    store.dispatch(ChangeSelectedDayAction(selectedDay: day));
-
-    _animationController.forward(from: 0.0);
-  }
-
   Widget _buildTaskCounter(DateTime date, List tasks) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -221,18 +219,32 @@ class _CalendarState extends State<Calendar> with TickerProviderStateMixin {
     Map<TaskStatus, List<Task>> map =
         groupBy(tasks, (Task task) => task.status);
 
-    if (map[TaskStatus.DONE] != null &&
-        map[TaskStatus.PARTIALLY] == null &&
-        map[TaskStatus.NOT_DONE] == null) {
-      if (map[TaskStatus.EMPTY] != null)
+    if (map[TaskStatus.DONE] != null){
+      if (map[TaskStatus.EMPTY] != null || 
+      map[TaskStatus.PARTIALLY] != null || 
+      map[TaskStatus.NOT_DONE] != null)
         color = Colors.orange;
       else
         color = Colors.green;
-    } else if (map[TaskStatus.PARTIALLY] != null) {
+    }else if(map[TaskStatus.PARTIALLY] != null){
       color = Colors.orange;
-    } else if (map[TaskStatus.NOT_DONE] != null) {
+    }else if(map[TaskStatus.NOT_DONE] != null){
       color = Colors.red;
     }
+
+
+    // if (map[TaskStatus.DONE] != null &&
+    //     map[TaskStatus.PARTIALLY] == null &&
+    //     map[TaskStatus.NOT_DONE] == null) {
+    //   if (map[TaskStatus.EMPTY] != null)
+    //     color = Colors.orange;
+    //   else
+    //     color = Colors.green;
+    // } else if (map[TaskStatus.PARTIALLY] != null) {
+    //   color = Colors.orange;
+    // } else if (map[TaskStatus.NOT_DONE] != null) {
+    //   color = Colors.red;
+    // }
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),

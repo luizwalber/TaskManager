@@ -13,7 +13,7 @@ import 'package:task_manager/utils/date_utils.dart';
 import 'package:task_manager/utils/enums.dart';
 import 'package:task_manager/utils/styles.dart';
 
-/// TODO class???
+/// TODO REFACTOR !!!!!!!!
 /// TODO know bug -> when adding a task in the front the task doesn't have an ID, this will be a problem when using the database
 void addTaskDialog(BuildContext context, DateTime selectedDay, {Task task}) {
   Dialog dialog = Dialog(
@@ -112,7 +112,8 @@ class AddTaskFormState extends State<AddTaskForm> {
               padding: const EdgeInsets.only(top: 15),
               child: Divider(height: 30, thickness: 3, color: Colors.black12),
             ),
-            _submitWidget()
+            _submitWidget(),
+            SizedBox(width: 50,),
           ],
         ));
   }

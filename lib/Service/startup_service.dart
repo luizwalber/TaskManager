@@ -7,7 +7,6 @@ import 'package:task_manager/Service/user_service.dart';
 import 'package:task_manager/main.dart';
 import 'package:task_manager/model/User.dart';
 import 'package:task_manager/redux/actions/load_user_action.dart';
-import 'package:task_manager/redux/actions/load_user_preferences_action.dart';
 
 /// Service to isolate the actions for the app startup
 class StartupService {

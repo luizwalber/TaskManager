@@ -82,7 +82,7 @@ class TaskService {
     var futures = <Future>[];
 
     taskSchemas.forEach((schema) {
-      futures.add(TaskService.instance._processSchema(schema));
+      futures.add(_processSchema(schema));
     });
 
     await Future.wait(futures);
@@ -90,6 +90,7 @@ class TaskService {
   }
 
   Future<void> _processSchema(TaskSchema taskSchema) {
+    bool changed = false;
     var futures = <Future>[];
     for (var monthHash in taskSchema.processInMonths.keys) {
       if (taskSchema.processInMonths[monthHash]) {
@@ -108,6 +109,7 @@ class TaskService {
               useLocation: taskSchema.useLocation,
               useAlarm: taskSchema.useAlarm,
               createdBy: taskSchema.createdBy,
+              status: TaskStatus.EMPTY,
             );
             futures.add(addTask(task));
           }
@@ -115,10 +117,13 @@ class TaskService {
           currentMonth = date.month;
           taskSchema.processInMonths[monthHash] = false;
         } while (currentMonth == initialMonth);
+        changed = true;
       }
     }
-    // TODO sometimes here I'm updating a schema that doesn't exist (the first) fix latter
-    futures.add(TaskSchemaService.instance.updateTaskSchema(taskSchema));
+
+    if (changed) {
+      futures.add(TaskSchemaService.instance.updateTaskSchema(taskSchema));
+    }
     return Future.wait(futures);
   }
 
@@ -164,11 +169,11 @@ class TaskService {
   }
 
   void changeMonth(int year, int month, List<TaskSchema> taskSchemas) {
-    for (TaskSchema currentSchema in taskSchemas) {
-      String currentMonthHash = dateMonthHash(new DateTime(year, month));
-      String nextMonthHash = dateMonthHash(new DateTime(year, month + 1));
-      String previousMonthHash = dateMonthHash(new DateTime(year, month - 1));
+    String currentMonthHash = dateMonthHash(new DateTime(year, month));
+    String nextMonthHash = dateMonthHash(new DateTime(year, month + 1));
+    String previousMonthHash = dateMonthHash(new DateTime(year, month - 1));
 
+    for (TaskSchema currentSchema in taskSchemas) {
       currentSchema.processInMonths.putIfAbsent(currentMonthHash, () => true);
       currentSchema.processInMonths.putIfAbsent(nextMonthHash, () => true);
       currentSchema.processInMonths.putIfAbsent(previousMonthHash, () => true);

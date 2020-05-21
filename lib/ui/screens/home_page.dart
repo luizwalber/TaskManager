@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage> {
           return Calendar(
             monthlyTasks: vm.monthlyTasks,
             taskSchemas: vm.taskSchemas,
+            changeSelectedDay: vm.changeSelectedDay,
           );
         });
   }
